@@ -126,3 +126,58 @@ export function readout(g, h) {
   }
   return lines;
 }
+
+/* ── Who did you just build? ───────────────────────────────────────────────
+   Root-mean-square difference across the five ratings. The scale is anchored
+   on measurement, not taste: two randomly drawn players in this pool sit at
+   RMS 18.2, so that distance is defined as a 50% match — "no more alike than
+   two players picked at random". */
+export const MATCH_SCALE = 36;
+
+export function profileDistance(a, b) {
+  return Math.sqrt(SLOT_KEYS.reduce((s, k) => s + Math.pow(a[k] - b[k], 2), 0) / SLOT_KEYS.length);
+}
+
+export function matchPct(distance) {
+  return Math.max(0, Math.min(1, 1 - distance / MATCH_SCALE));
+}
+
+function ratingsOf(picks, byId) {
+  const r = {};
+  for (const k of SLOT_KEYS) r[k] = byId.get(picks[k])[k];
+  return r;
+}
+
+export function buildRatings(picks, pool) {
+  return ratingsOf(picks, pool instanceof Map ? pool : new Map(pool.map(p => [p.id, p])));
+}
+
+// Closest real players by raw profile. The build's own five sources are
+// excluded from being their own comp only where they would be trivially close
+// on one axis — they are still eligible, because "you basically built Kawhi"
+// is a true and useful thing to say.
+export function comps(ratings, pool, n = 4) {
+  return pool
+    .map(p => { const d = profileDistance(ratings, p); return { player: p, distance: d, match: matchPct(d) }; })
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, n);
+}
+
+// Which archetype is this, and how cleanly? `archetypes` is [{name, ratings}].
+export function archetypeOf(ratings, archetypes) {
+  const scored = archetypes
+    .map(a => { const d = profileDistance(ratings, a.ratings); return { name: a.name, tag: a.tag, distance: d, match: matchPct(d) }; })
+    .sort((a, b) => a.distance - b.distance);
+  return { best: scored[0], runnerUp: scored[1], all: scored };
+}
+
+// How lopsided is the build? Useful copy: a flat build and a spiky one that
+// cost the same play very differently.
+export function shape(ratings) {
+  const vals = SLOT_KEYS.map(k => ratings[k]);
+  const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+  const sd = Math.sqrt(vals.reduce((s, v) => s + (v - mean) * (v - mean), 0) / vals.length);
+  const top = SLOT_KEYS.reduce((a, k) => ratings[k] > ratings[a] ? k : a, SLOT_KEYS[0]);
+  const bottom = SLOT_KEYS.reduce((a, k) => ratings[k] < ratings[a] ? k : a, SLOT_KEYS[0]);
+  return { mean, sd, top, bottom, spread: Math.max(...vals) - Math.min(...vals) };
+}

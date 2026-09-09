@@ -23,6 +23,12 @@ Gate 1 (SPEC) approved, gate 2 (PLAN) approved. Build in progress.
   all four report sections render, watch-a-game works, state survives reload,
   league creation still works afterwards.
 
+## Round 3 — Player comps and mobile
+- S9 similarity + comps (`src/scout.js`) — VERIFIED (4 tests, AC-29..31)
+- S10 radar comp section + mobile pass — VERIFIED in Chromium at 390px and
+  1340px, light and dark: document width exactly 390 with no page-level
+  horizontal scroll, axis labels no longer collide, no page errors.
+
 ## Deviations
 - Shape-balance measurement initially compared builds of unequal cost (balanced
   spent 745, sniper 619), which made `balanced` look dominant. Harness now fits
@@ -44,6 +50,14 @@ Gate 1 (SPEC) approved, gate 2 (PLAN) approved. Build in progress.
   have worked for most of them. Added build codes as a text-message path.
 - The identity gate was blocking every tab, not just the build screen, so a
   spectator (or the demo) could never reach the tournament or draft board.
+
+## Failed approaches (round 3)
+- Guessed twice at which element broke the phone layout before measuring it.
+  The real cause was two separate things: report tables with no overflow
+  container (Chromium lays out closed `<details>` content, so a hidden table
+  still forced the page wide), and grid items defaulting to `min-width:auto`,
+  which let the cap sheet push its column past the viewport and shrink-to-fit
+  the whole page to 433px.
 
 ## Failed approaches (round 2)
 - Generating preset opponents by filling every archetype to the cap homogenised

@@ -51,6 +51,14 @@ replacement), your shot mix and shooting percentage, and a full
 possession-by-possession game against any of the eight. Nothing in the Lab
 touches a league.
 
+It also tells you **who you just built**: the closest archetype with a match
+percentage, and the closest real player in the pool, overlaid on a radar of all
+five ratings. Match is root-mean-square difference across the five slots, scaled
+so that two players drawn at random from the pool score 50% — so a number well
+above that means something. A build of Klay's shot, Reggie's handle, Tyson
+Chandler's frame, Bruce Bowen's defense and Shawn Marion's athleticism comes out
+as 91% Anthony Davis.
+
 The most useful thing it tells you: **punting a category is punished hard.**
 Elite shot creation with a 30 defense wins about 25% of the time.
 
@@ -80,7 +88,7 @@ Run `npm run calibrate` to see the numbers for yourself.
 ## Use
 
 ```bash
-npm test        # 37 tests, no dependencies
+npm test        # 41 tests, no dependencies
 npm run build   # regenerate app.html from src/ + data/ + web/
 npm run calibrate
 ```

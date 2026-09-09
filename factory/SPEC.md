@@ -196,6 +196,39 @@ creating a league. Not an amendment — nothing above changed.
   the grade and the overall figure, and its second names the best and worst
   matchup by the names in the gauntlet rows.
 
+## Round 3 — Player comps and mobile (2026-09-09, requested)
+
+Two asks: the leverage chart's axis labels collided on a phone, and the report
+should say what archetype a build is, ideally overlaid on a real player.
+
+### Decisions
+- Match is root-mean-square difference across the five ratings, anchored on
+  measurement rather than taste: two players drawn at random from this pool sit
+  at RMS 18.2, so that distance is DEFINED as 50%. The scale constant is 36.
+- Matching is on raw ratings, not shape-normalised. A cap-legal build cannot
+  reach a superstar's magnitude, and "you built roughly peak Anthony Davis" is
+  more useful and more honest than "you have LeBron's silhouette at half size".
+- A radar is the right form here and only here: five axes on one shared 0-99
+  scale, two profiles compared. Identity is carried by fill-vs-dashed-stroke and
+  per-axis numeric labels, not by color alone.
+- Report tables live in their own overflow-x container. Chromium lays out closed
+  `<details>` content, so a hidden table still widened the page.
+
+### Acceptance criteria
+- [t1] AC-29: Given a profile, when its distance to itself is measured, then it
+  is 0 and reads as a 100% match; distance is symmetric, grows with difference,
+  floors at 0% and never goes negative; and RMS 18.2 reads as 50%.
+- [t1] AC-30: Given a build, when comps are requested, then they are sorted by
+  distance, every match is between 0 and 1, the top comp beats the pool average
+  distance by at least half, and a profile copied from a real player returns
+  that player at 100%.
+- [t1] AC-31: Given a build close to one archetype, when the archetype is
+  resolved, then that archetype is named with a match above 85% and a runner-up
+  no closer than the winner.
+- [t1] AC-32: Given the report at a 390px viewport, when it is rendered, then
+  the document is exactly 390px wide with no horizontal page scroll, and any
+  table wider than that scrolls inside its own container.
+
 ## Appended
 
 <empty — written only by factory-judge>

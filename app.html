@@ -92,6 +92,9 @@ section{margin-bottom:34px}
 
 /* ── build bay ── */
 .bay{display:grid;grid-template-columns:minmax(300px,384px) 1fr;gap:22px;align-items:start}
+/* Grid items default to min-width:auto, which lets wide content push a column
+   past its track and shrink-to-fit the whole page on a phone. */
+.bay > *{min-width:0}
 @media (max-width:900px){.bay{grid-template-columns:1fr}}
 .sheet{background:var(--surface);border:1px solid var(--line);position:sticky;top:100px;
   max-height:calc(100vh - 116px);overflow-y:auto}
@@ -259,17 +262,24 @@ dialog::backdrop{background:rgba(8,11,10,.62)}
 .track .fill.win{background:var(--viz-win);border-radius:0 4px 4px 0}
 .track .fill.loss{background:var(--viz-loss);border-radius:4px 0 0 4px}
 .track .fill.mag{left:2px;background:var(--viz-win);border-radius:0 4px 4px 0}
-.axis{display:grid;grid-template-columns:126px 1fr 58px;gap:11px;margin-top:5px}
-.axis span{grid-column:2;display:flex;justify-content:space-between;font-family:var(--f-mono);
-  font-size:9.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.axis{display:grid;grid-template-columns:126px 1fr 58px;gap:11px;margin-top:6px}
+.axis > span{grid-column:2;display:grid;grid-template-columns:1fr auto 1fr;gap:8px;
+  font-family:var(--f-mono);font-size:9.5px;letter-spacing:.09em;color:var(--muted);
+  text-transform:uppercase}
+.axis > span > :nth-child(1){text-align:left}
+.axis > span > :nth-child(2){text-align:center}
+.axis > span > :nth-child(3){text-align:right}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--f-mono);font-size:10px;
   letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
 .legend i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px}
-.mixrow{display:grid;grid-template-columns:96px 1fr 96px;gap:11px;align-items:center;font-size:13px;
-  padding:3px 0}
+.mixrow{display:grid;grid-template-columns:104px minmax(0,1fr) 52px;gap:11px;align-items:center;
+  font-size:13px;padding:3px 0}
+.mixrow .val{text-align:right}
 .mixrow .val{font-family:var(--f-mono);font-size:12px;font-variant-numeric:tabular-nums;
   color:var(--muted)}
 details.tbl{margin-top:12px}
+.tblscroll{overflow-x:auto;max-width:100%}
+.tblscroll table{min-width:min(100%,320px)}
 details.tbl summary{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.11em;
   text-transform:uppercase;color:var(--muted);cursor:pointer}
 details.tbl table{margin-top:8px;font-size:12.5px}
@@ -281,6 +291,67 @@ details.tbl table{margin-top:8px;font-size:12.5px}
 .opp b{font-family:var(--f-display);font-size:17px;font-weight:700}
 .opp span{font-size:12px;color:var(--muted)}
 .opp code{font-family:var(--f-mono);font-size:10.5px;color:var(--faint)}
+
+/* ── who you built: radar comp ── */
+.comp{display:grid;grid-template-columns:minmax(0,440px) minmax(200px,270px);gap:26px;
+  align-items:start;justify-content:start}
+.comp > *{min-width:0}
+@media (max-width:720px){.comp{grid-template-columns:1fr}}
+.radar{width:100%;max-width:440px;height:auto;display:block;overflow:visible}
+.radar .ring{fill:none;stroke:var(--viz-grid);stroke-width:1;opacity:.55}
+.radar .spoke{stroke:var(--viz-grid);stroke-width:1;opacity:.45}
+.radar .comp-poly{fill:none;stroke:var(--muted);stroke-width:2;stroke-dasharray:5 4;
+  stroke-linejoin:round}
+.radar .you-poly{fill:var(--accent);fill-opacity:.20;stroke:var(--accent);stroke-width:2.5;
+  stroke-linejoin:round}
+.radar .dot-you{fill:var(--accent)}
+.radar .ax{fill:var(--ink);font-family:var(--f-display);font-size:13px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase}
+.radar .v-you{fill:var(--accent);font-family:var(--f-mono);font-size:12px;font-weight:600}
+.radar .v-them{fill:var(--muted);font-family:var(--f-mono);font-size:12px}
+.matchcard{background:var(--sunken);border:1px solid var(--line);padding:13px 14px;
+  display:flex;flex-direction:column;gap:9px}
+.matchcard .who{font-family:var(--f-display);font-size:22px;font-weight:800;line-height:1.05}
+.matchcard .sub{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;color:var(--muted);
+  text-transform:uppercase}
+.matchcard .pctbig{font-family:var(--f-display);font-size:40px;font-weight:800;line-height:.9;
+  font-variant-numeric:tabular-nums;color:var(--accent)}
+.altlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.altlist li{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;
+  border-top:1px solid var(--line-soft);padding-top:5px}
+.altlist b{font-weight:500}
+.altlist span{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.archline{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:2px}
+.archline b{font-family:var(--f-display);font-size:21px;font-weight:700}
+
+/* ── phone ── */
+@media (max-width:640px){
+  .bar,.axis{grid-template-columns:88px minmax(0,1fr) 52px;gap:8px}
+  .bar{font-size:12.5px}
+  .bar .val{font-size:11.5px}
+  .axis > span{font-size:8.5px;letter-spacing:.04em;gap:4px}
+  .mixrow{grid-template-columns:88px minmax(0,1fr) 40px;gap:8px;font-size:12.5px}
+  .mixrow .val{font-size:11px}
+  .hero{flex-wrap:wrap;gap:8px}
+  .hero b{font-size:44px}
+  .vsec,.report-hd,.hero{padding-left:13px;padding-right:13px}
+  .reads{padding-left:13px;padding-right:13px}
+  .head h2{font-size:23px}
+  .board-in{gap:12px;padding:9px 13px}
+  .mark b{font-size:19px}
+  main{padding:16px 13px 60px}
+  .pickrow{grid-template-columns:44px minmax(0,1fr);gap:10px}
+  .pick-r{grid-column:2;text-align:left}
+  .pick-n{font-size:30px}
+  .matchcard .pctbig{font-size:34px}
+  .vsec tbody td,.vsec thead th{padding:6px 7px;font-size:12px}
+  .gcard tbody td,.gcard thead th{padding:6px 8px}
+  .series{grid-template-columns:1fr}
+  .oppgrid{grid-template-columns:1fr}
+  dialog{width:calc(100% - 16px)}
+  .pbp li{grid-template-columns:26px minmax(0,1fr) 42px;gap:7px;font-size:12.5px}
+  .dlg-bd{padding:6px 13px 16px}
+}
 
 /* ── setup + misc ── */
 .card{background:var(--surface);border:1px solid var(--line);padding:18px}
@@ -955,6 +1026,61 @@ function readout(g, h) {
   return lines;
 }
 
+/* ── Who did you just build? ───────────────────────────────────────────────
+   Root-mean-square difference across the five ratings. The scale is anchored
+   on measurement, not taste: two randomly drawn players in this pool sit at
+   RMS 18.2, so that distance is defined as a 50% match — "no more alike than
+   two players picked at random". */
+const MATCH_SCALE = 36;
+
+function profileDistance(a, b) {
+  return Math.sqrt(SLOT_KEYS.reduce((s, k) => s + Math.pow(a[k] - b[k], 2), 0) / SLOT_KEYS.length);
+}
+
+function matchPct(distance) {
+  return Math.max(0, Math.min(1, 1 - distance / MATCH_SCALE));
+}
+
+function ratingsOf(picks, byId) {
+  const r = {};
+  for (const k of SLOT_KEYS) r[k] = byId.get(picks[k])[k];
+  return r;
+}
+
+function buildRatings(picks, pool) {
+  return ratingsOf(picks, pool instanceof Map ? pool : new Map(pool.map(p => [p.id, p])));
+}
+
+// Closest real players by raw profile. The build's own five sources are
+// excluded from being their own comp only where they would be trivially close
+// on one axis — they are still eligible, because "you basically built Kawhi"
+// is a true and useful thing to say.
+function comps(ratings, pool, n = 4) {
+  return pool
+    .map(p => { const d = profileDistance(ratings, p); return { player: p, distance: d, match: matchPct(d) }; })
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, n);
+}
+
+// Which archetype is this, and how cleanly? `archetypes` is [{name, ratings}].
+function archetypeOf(ratings, archetypes) {
+  const scored = archetypes
+    .map(a => { const d = profileDistance(ratings, a.ratings); return { name: a.name, tag: a.tag, distance: d, match: matchPct(d) }; })
+    .sort((a, b) => a.distance - b.distance);
+  return { best: scored[0], runnerUp: scored[1], all: scored };
+}
+
+// How lopsided is the build? Useful copy: a flat build and a spiky one that
+// cost the same play very differently.
+function shape(ratings) {
+  const vals = SLOT_KEYS.map(k => ratings[k]);
+  const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+  const sd = Math.sqrt(vals.reduce((s, v) => s + (v - mean) * (v - mean), 0) / vals.length);
+  const top = SLOT_KEYS.reduce((a, k) => ratings[k] > ratings[a] ? k : a, SLOT_KEYS[0]);
+  const bottom = SLOT_KEYS.reduce((a, k) => ratings[k] < ratings[a] ? k : a, SLOT_KEYS[0]);
+  return { mean, sd, top, bottom, spread: Math.max(...vals) - Math.min(...vals) };
+}
+
 </script>
 <script>
 (function(){
@@ -1248,7 +1374,7 @@ function screenBuild(){
     ? `<span class="pill live" style="justify-content:center;padding:9px"><span class="dot"></span><span>Locked in</span></span>
        <p class="note" style="margin:0">Send this to your commissioner:</p>
        <code class="num" style="display:block;background:var(--sunken);border:1px solid var(--line);
-         padding:7px 9px;font-size:12px;word-break:break-all">${esc(encodeBuild(S.me, picks))}</code>
+         padding:7px 9px;font-size:12px;word-break:break-all;overflow-wrap:anywhere">${esc(encodeBuild(S.me, picks))}</code>
        <button class="btn ghost sm" data-act="copy-code">Copy build code</button>
        <button class="btn ghost" data-act="unlock">Unlock and edit</button>`
     : `<button class="btn hot" data-act="lock" ${v.ok ? '' : 'disabled'}>Lock in build</button>
@@ -1275,6 +1401,96 @@ function pctBar(rate){
 }
 const pc = x => Math.round(x * 100);
 
+// Five axes on one shared 0-99 scale is the case a radar is actually good for.
+// Offense sits top-right, the physical and defensive slots bottom-left.
+const RADAR_AXES = ['sc', 'hnd', 'ath', 'def', 'frm'];
+
+function radarSvg(you, them, themLabel){
+  const CX = 232, CY = 210, R = 116, MAX = 99;
+  const pt = (i, frac) => {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / RADAR_AXES.length;
+    return [CX + Math.cos(a) * R * frac, CY + Math.sin(a) * R * frac];
+  };
+  const poly = vals => RADAR_AXES.map((k, i) => pt(i, Math.max(0.04, vals[k] / MAX)).map(n => n.toFixed(1)).join(',')).join(' ');
+  const rings = [0.25, 0.5, 0.75, 1].map(f =>
+    `<polygon class="ring" points="${RADAR_AXES.map((_, i) => pt(i, f).map(n => n.toFixed(1)).join(',')).join(' ')}"></polygon>`).join('');
+  const spokes = RADAR_AXES.map((_, i) => {
+    const [x, y] = pt(i, 1);
+    return `<line class="spoke" x1="${CX}" y1="${CY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"></line>`;
+  }).join('');
+  const labels = RADAR_AXES.map((k, i) => {
+    const [lx, ly] = pt(i, 1.30);
+    const anchor = Math.abs(lx - CX) < 8 ? 'middle' : lx > CX ? 'start' : 'end';
+    const dy = ly < CY - 40 ? -6 : ly > CY + 40 ? 14 : 0;
+    const short = SLOTS.find(sl => sl.key === k).short;
+    return `<text class="ax" x="${lx.toFixed(1)}" y="${(ly + dy).toFixed(1)}" text-anchor="${anchor}">${short}</text>
+      <text class="v-you" x="${lx.toFixed(1)}" y="${(ly + dy + 15).toFixed(1)}" text-anchor="${anchor}">${you[k]}</text>
+      <text class="v-them" x="${lx.toFixed(1)}" y="${(ly + dy + 29).toFixed(1)}" text-anchor="${anchor}">${them[k]}</text>`;
+  }).join('');
+  const dots = RADAR_AXES.map((k, i) => {
+    const [x, y] = pt(i, Math.max(0.04, you[k] / MAX));
+    return `<circle class="dot-you" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5"></circle>`;
+  }).join('');
+  return `<svg class="radar" viewBox="0 0 464 420" role="img"
+      aria-label="Your build against ${esc(themLabel)}, rated across all five slots">
+    <g>${rings}${spokes}</g>
+    <polygon class="comp-poly" points="${poly(them)}"></polygon>
+    <polygon class="you-poly" points="${poly(you)}"></polygon>
+    ${dots}${labels}</svg>`;
+}
+
+function compSection(picks){
+  const you = buildRatings(picks, POOL);
+  const archs = PRESETS.map(p => ({ name: p.name, tag: p.tag, ratings: buildRatings(p.picks, POOL) }));
+  const arch = archetypeOf(you, archs);
+  const list = comps(you, POOL, 4);
+  const top = list[0];
+  const them = { sc: top.player.sc, hnd: top.player.hnd, frm: top.player.frm,
+                 def: top.player.def, ath: top.player.ath };
+  const sh = shape(you);
+  const lbl = k => SLOTS.find(sl => sl.key === k).label;
+  return `<div class="vsec"><h4>Who you built</h4>
+    <p class="note">Your five ratings against the closest real player in the pool. Match is scored on
+      how far apart the two profiles sit — two players drawn at random from this pool score 50%.</p>
+    <div class="archline"><span class="sub" style="font-family:var(--f-mono);font-size:10.5px;
+      letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Archetype</span>
+      <b>${esc(arch.best.name)}</b>
+      <span class="num" style="color:var(--accent)">${pc(arch.best.match)}% match</span>
+      <span class="note" style="margin:0">Next closest: ${esc(arch.runnerUp.name)} at ${pc(arch.runnerUp.match)}%</span></div>
+    <p class="note" style="margin:0 0 12px">${esc(arch.best.tag)}
+      Your build peaks at ${esc(lbl(sh.top))} (${you[sh.top]}) and bottoms out at
+      ${esc(lbl(sh.bottom))} (${you[sh.bottom]}) — a ${sh.spread}-point spread.</p>
+    <div class="comp">
+      <div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Your build</span>
+          <span><i style="background:var(--muted)"></i>${esc(top.player.name)}</span></div>
+        ${radarSvg(you, them, top.player.name)}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="matchcard">
+          <span class="sub">Closest player</span>
+          <span class="who">${esc(top.player.name)}</span>
+          <span class="sub">${esc(top.player.season)} · ${esc(top.player.team)}</span>
+          <span class="pctbig num">${pc(top.match)}%</span>
+          <span class="sub" style="letter-spacing:.06em">profile match</span>
+          <span class="note" style="margin:0">${esc(top.player.note)}</span>
+        </div>
+        <div><p class="sub" style="font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;
+          text-transform:uppercase;color:var(--muted);margin:0 0 6px">Also in the neighbourhood</p>
+          <ul class="altlist">${list.slice(1).map(c => `<li><b>${esc(c.player.name)}</b>
+            <span>${pc(c.match)}%</span></li>`).join('')}</ul></div>
+      </div>
+    </div>
+    <details class="tbl"><summary>Show as a table</summary>
+      <div class="tblscroll"><table><thead><tr><th>Slot</th><th class="r">You</th>
+        <th class="r">${esc(top.player.name.split(' ').slice(-1)[0])}</th><th class="r">Diff</th></tr></thead>
+        <tbody>${SLOTS.map(sl => { const d = you[sl.key] - them[sl.key];
+          return `<tr><td>${esc(sl.label)}</td><td class="r num">${you[sl.key]}</td>
+          <td class="r num">${them[sl.key]}</td>
+          <td class="r num">${d > 0 ? '+' : d < 0 ? '−' : ''}${Math.abs(d) || '—'}</td></tr>`;
+        }).join('')}</tbody></table></div></details></div>`;
+}
+
 function reportView(r){
   const g = r.gauntlet, h = r.h2h, lev = r.leverage;
   const worst = Math.max(...lev.map(l => Math.abs(l.drop)), 0.05);
@@ -1290,6 +1506,8 @@ function reportView(r){
         archetypes, each of them built to the same ${budget()}-point cap.</span></span></div>
     <ul class="reads">${r.readout.slice(1).map(l => `<li>${esc(l)}</li>`).join('')}</ul>
 
+    ${compSection(S.lab.picks)}
+
     <div class="vsec"><h4>Matchup by matchup</h4>
       <p class="note">Win rate against each archetype. The centre line is an even fight.</p>
       <div class="legend">
@@ -1302,13 +1520,13 @@ function reportView(r){
       </div>`).join('')}</div>
       <div class="axis"><span><span>0%</span><span>even</span><span>100%</span></span></div>
       <details class="tbl"><summary>Show as a table</summary>
-        <table><thead><tr><th>Opponent</th><th class="r">Win rate</th><th class="r">Avg score</th>
+        <div class="tblscroll"><table><thead><tr><th>Opponent</th><th class="r">Win rate</th><th class="r">Avg score</th>
           <th class="r">Possessions</th></tr></thead><tbody>
           ${g.rows.map(row => `<tr><td>${esc(row.name)}</td>
             <td class="r num">${pc(row.winRate)}%</td>
             <td class="r num">${row.avgScore[0].toFixed(1)}-${row.avgScore[1].toFixed(1)}</td>
             <td class="r num">${row.possessions.toFixed(0)}</td></tr>`).join('')}
-        </tbody></table></details></div>
+        </tbody></table></div></details></div>
 
     <div class="vsec"><h4>Which picks are carrying you</h4>
       <p class="note">What each pick is worth next to a replacement-level player in that slot.
@@ -1326,21 +1544,21 @@ function reportView(r){
             style="${up ? 'left:50%' : 'right:50%'};width:calc(${w.toFixed(1)}% - 1px)"></div></div>
         <span class="val" style="color:${up ? 'var(--viz-win)' : 'var(--viz-loss)'}">${pc(l.drop) === 0 ? 'even' : (up ? '+' : '\u2212') + Math.abs(pc(l.drop)) + ' pts'}</span>
       </div>`; }).join('')}</div>
-      <div class="axis"><span><span>worse than replacement</span><span>even</span><span>carrying you</span></span></div>
+      <div class="axis"><span><span>below replacement</span><span>even</span><span>carrying you</span></span></div>
       <details class="tbl"><summary>Show as a table</summary>
-        <table><thead><tr><th>Slot</th><th>Your pick</th><th class="r">Rating</th>
-          <th class="r">Cost</th><th class="r">Worth vs replacement</th></tr></thead><tbody>
+        <div class="tblscroll"><table><thead><tr><th>Slot</th><th>Your pick</th><th class="r">Rating</th>
+          <th class="r">Cost</th><th class="r">Worth</th></tr></thead><tbody>
           ${lev.map(l => `<tr><td>${esc(l.label)}</td><td>${esc(l.player)}</td>
             <td class="r num">${l.rating}</td><td class="r num">${l.cost}</td>
             <td class="r num">${pc(l.drop) === 0 ? 'even' : (l.drop >= 0 ? '+' : '\u2212') + Math.abs(pc(l.drop)) + ' pts'}</td></tr>`).join('')}
-        </tbody></table></details></div>
+        </tbody></table></div></details></div>
 
     <div class="vsec"><h4>How you score</h4>
-      <p class="note">Shot mix and accuracy against ${esc(r.h2hName)}, over ${r.runs} games.</p>
+      <p class="note">Share of your shots, and how they fall, against ${esc(r.h2hName)} over ${r.runs} games.</p>
       ${[['Jumpers (2s)', mix.jumper], ['Drives (1s)', mix.drive], ['Post-ups (1s)', mix.post]]
         .map(([label, val]) => `<div class="mixrow"><span>${label}</span>
           <div class="track"><div class="fill mag" style="width:calc(${(val * 96).toFixed(1)}% - 4px)"></div></div>
-          <span class="val">${pc(val)}% of shots</span></div>`).join('')}
+          <span class="val">${pc(val)}%</span></div>`).join('')}
       <div class="mixrow" style="border-top:1px solid var(--line-soft);margin-top:7px;padding-top:9px">
         <span>Overall</span><span class="val" style="grid-column:2/4">${pc(h.you.fg)}% shooting ·
         ${h.you.ppg.toFixed(1)} points · ${h.you.turnovers.toFixed(1)} turnovers ·

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { headToHead, gauntlet, leverage, readout, grade } from '../src/scout.js';
+import { headToHead, gauntlet, leverage, readout, grade, profileDistance, matchPct,
+         comps, archetypeOf, shape, buildRatings } from '../src/scout.js';
 import { toFighter, SLOT_KEYS, BUDGET, validateBuild } from '../src/ratings.js';
 import { POOL, fighter, flat } from './helpers.js';
 
@@ -91,4 +92,65 @@ test('the readout says something true about the build it read', () => {
   assert.match(lines[1], new RegExp(g.best.name));
   assert.match(lines[1], new RegExp(g.worst.name));
   assert.match(lines[2], /jumpers|drives|post-ups/);
+});
+
+test('AC-29 profile distance is a real metric and the match scale is anchored', () => {
+  const a = { sc: 80, hnd: 70, frm: 90, def: 60, ath: 75 };
+  assert.equal(profileDistance(a, a), 0, 'a profile must be zero distance from itself');
+  assert.equal(matchPct(0), 1, 'zero distance must be a 100% match');
+  const b = { ...a, sc: 90 };
+  const c = { ...a, sc: 99 };
+  assert.ok(profileDistance(a, b) < profileDistance(a, c), 'distance must grow with difference');
+  assert.ok(Math.abs(profileDistance(a, b) - profileDistance(b, a)) < 1e-12, 'distance must be symmetric');
+  // The published anchor: two random players sit at RMS 18.2 in this pool.
+  assert.ok(Math.abs(matchPct(18.2) - 0.5) < 0.02,
+    `RMS 18.2 should read as a 50% match, got ${matchPct(18.2)}`);
+  assert.equal(matchPct(999), 0, 'match must floor at zero, never go negative');
+});
+
+test('AC-30 player comps are sorted, bounded, and actually resemble the build', () => {
+  const ratings = buildRatings(build('me').picks, POOL);
+  const list = comps(ratings, POOL, 5);
+  assert.equal(list.length, 5);
+  for (let i = 1; i < list.length; i++) {
+    assert.ok(list[i - 1].distance <= list[i].distance, 'comps are not sorted by distance');
+  }
+  for (const c of list) {
+    assert.ok(c.match >= 0 && c.match <= 1, 'match out of range');
+    assert.ok(c.player && c.player.name, 'comp is missing its player');
+  }
+  // The top comp must beat the pool average by a wide margin, or the metric is noise.
+  const avg = POOL.reduce((s, p) => s + profileDistance(ratings, p), 0) / POOL.length;
+  assert.ok(list[0].distance < avg / 2, `top comp ${list[0].distance} vs pool average ${avg}`);
+  // An exact copy of a player must return that player at 100%.
+  const kawhi = POOL.find(p => p.id === 'kawhi19');
+  const exact = comps({ sc: kawhi.sc, hnd: kawhi.hnd, frm: kawhi.frm, def: kawhi.def, ath: kawhi.ath }, POOL, 1);
+  assert.equal(exact[0].player.id, 'kawhi19');
+  assert.equal(exact[0].match, 1);
+});
+
+test('AC-31 archetype match names the nearest of the field with a runner-up', () => {
+  const arch = [
+    { name: 'Wall', ratings: { sc: 68, hnd: 56, frm: 99, def: 97, ath: 80 } },
+    { name: 'Blur', ratings: { sc: 80, hnd: 99, frm: 56, def: 68, ath: 97 } },
+    { name: 'Prototype', ratings: { sc: 85, hnd: 85, frm: 85, def: 85, ath: 85 } },
+  ];
+  const wallish = archetypeOf({ sc: 70, hnd: 58, frm: 97, def: 95, ath: 78 }, arch);
+  assert.equal(wallish.best.name, 'Wall');
+  assert.ok(wallish.best.match > 0.85, `a near-copy of Wall matched only ${wallish.best.match}`);
+  assert.ok(wallish.best.distance <= wallish.runnerUp.distance);
+  assert.equal(wallish.all.length, 3);
+  const blurish = archetypeOf({ sc: 82, hnd: 97, frm: 58, def: 66, ath: 95 }, arch);
+  assert.equal(blurish.best.name, 'Blur');
+});
+
+test('shape reports the peak and the hole in a build', () => {
+  const s = shape({ sc: 98, hnd: 66, frm: 90, def: 30, ath: 90 });
+  assert.equal(s.top, 'sc');
+  assert.equal(s.bottom, 'def');
+  assert.equal(s.spread, 68);
+  assert.ok(s.sd > 20, 'a build this lopsided should have a large spread');
+  const flat = shape({ sc: 85, hnd: 85, frm: 85, def: 85, ath: 85 });
+  assert.equal(flat.sd, 0);
+  assert.equal(flat.spread, 0);
 });
