@@ -157,6 +157,45 @@ every placement was decided by games and every game is reproducible from a seed.
 - [t2] AC-21: Given the published artifact, when two browsers open it and one
   locks a build, then the other sees the lock count increase without a reload.
 
+## Round 2 — The Lab (2026-09-09, requested after gate 1)
+
+Scope added at the user's request: a solo sandbox for testing a build without
+creating a league. Not an amendment — nothing above changed.
+
+### Decisions
+- The Lab lives in the same artifact, not a separate one, so there is one link.
+- It is the landing tab when no league exists. Setup is no longer forced.
+- Eight preset opponents, each cap-legal with five distinct sources, spread so
+  the field averages 37%-60% against itself. A field that is all pushovers or
+  all monsters would make the headline number meaningless.
+- The headline is win rate across the whole field, not against one opponent —
+  a single matchup says more about the matchup than about the build.
+- Chart marks use their own validated tokens. The UI accent green (#1F5E4E)
+  has chroma 0.069 and reads gray as a chart fill, so charts use #0E7A5C /
+  #C4441F in light and #20A47C / #EA6134 in dark.
+- Lab state is browser-local and never written to the league's shared store.
+
+### Acceptance criteria
+- [t1] AC-22: Given a build and an opponent, when the same head-to-head is run
+  twice with the same seed, then both runs return identical aggregates.
+- [t1] AC-23: Given a head-to-head result, when its shot mix is summed, then it
+  totals 1, and shooting percentage, clean-look rate and blow-by rate are all
+  between 0 and 1.
+- [t1] AC-24: Given a flat-90 build and a flat-70 build, when both are run
+  against the same field, then the stronger build's gauntlet score exceeds the
+  weaker one's by at least 20 points.
+- [t1] AC-25: Given a gauntlet result, when best and worst are read, then they
+  are the maximum and minimum of the rows reported, and the overall score is the
+  mean of those rows.
+- [t1] AC-26: Given a five-slot build, when leverage runs, then it returns one
+  row per slot sorted by impact, and every replacement it proposes leaves five
+  distinct source players in the build.
+- [t1] AC-27: Given any win rate from 0 to 100, when it is graded, then it falls
+  into exactly one of Strong / Solid / Middling / Struggling with no gap.
+- [t1] AC-28: Given a readout, when it is rendered, then its first line names
+  the grade and the overall figure, and its second names the best and worst
+  matchup by the names in the gauntlet rows.
+
 ## Appended
 
 <empty — written only by factory-judge>

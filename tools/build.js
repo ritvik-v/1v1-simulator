@@ -18,6 +18,7 @@ const bundle = [
   demodule(read('src/ratings.js')),
   demodule(read('src/sim.js')),
   demodule(read('src/tournament.js')),
+  demodule(read('src/scout.js')),
 ].join('\n\n');
 
 const out = read('web/app.template.html').replace('/*__BUNDLE__*/', () => bundle);

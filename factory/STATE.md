@@ -16,6 +16,13 @@ Gate 1 (SPEC) approved, gate 2 (PLAN) approved. Build in progress.
   AC-21 (two-browser live sync) is UNVERIFIED — it needs two signed-in humans on
   the published page, which cannot be checked from here. Not claimed as passing.
 
+## Round 2 — The Lab
+- S7 scouting engine (`src/scout.js`) — VERIFIED (7 tests, AC-22..28)
+- S8 Lab screen — VERIFIED in Chromium: lands with no league, "Surprise me"
+  produces cap-legal builds (721-745 of 750), scout completes in ~600ms,
+  all four report sections render, watch-a-game works, state survives reload,
+  league creation still works afterwards.
+
 ## Deviations
 - Shape-balance measurement initially compared builds of unequal cost (balanced
   spent 745, sniper 619), which made `balanced` look dominant. Harness now fits
@@ -37,6 +44,17 @@ Gate 1 (SPEC) approved, gate 2 (PLAN) approved. Build in progress.
   have worked for most of them. Added build codes as a text-message path.
 - The identity gate was blocking every tab, not just the build screen, so a
   spectator (or the demo) could never reach the tournament or draft board.
+
+## Failed approaches (round 2)
+- Generating preset opponents by filling every archetype to the cap homogenised
+  them: The Sniper and The Iso Handler both converged on 99 shot creation /
+  99 handle, because shot creation is the strongest buy. Fixed by scaling each
+  archetype's SHAPE to the cap instead of greedily filling it.
+- Uniform offset scaling then distorted the one low-variance shape (a pure
+  shooter came out 99/82/84/72/80, which is not a pure shooter). That preset is
+  hand-authored.
+- The UI palette failed the categorical validator outright in both modes —
+  chroma floor in light, lightness band in dark. Charts got their own tokens.
 
 ## Failed approaches
 - Uniformly scaling every coefficient down flattened the skill gradient but did

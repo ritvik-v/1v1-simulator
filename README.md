@@ -36,6 +36,24 @@ not have here: in 1v1 playmaking is worth nothing, rim protection is worth less,
 and on-ball defense is worth much more. The file is plain JSON with a note on
 every player — argue with it and edit it, that is the point.
 
+## The Lab
+
+Open the app with no league and you land in the Lab: build anything, hit **Scout
+this build**, and it plays 400 games against each of eight preset archetypes —
+The Sniper, The Wall, The Blur, The Lockdown, The Bully, The Prototype, The Iso
+Handler, The Freak. Each is cap-legal with five distinct sources, and the field
+is spread so it averages 37%-60% against itself, which is what makes a gauntlet
+score mean anything.
+
+The report gives you a win rate against each archetype, a read on which of your
+five picks is actually carrying the build (and which is worse than a cheap
+replacement), your shot mix and shooting percentage, and a full
+possession-by-possession game against any of the eight. Nothing in the Lab
+touches a league.
+
+The most useful thing it tells you: **punting a category is punished hard.**
+Elite shot creation with a 30 defense wins about 25% of the time.
+
 ## The tournament
 
 Three groups of four, round robin, then a placement bracket: play-in,
@@ -62,7 +80,7 @@ Run `npm run calibrate` to see the numbers for yourself.
 ## Use
 
 ```bash
-npm test        # 30 tests, no dependencies
+npm test        # 37 tests, no dependencies
 npm run build   # regenerate app.html from src/ + data/ + web/
 npm run calibrate
 ```
@@ -81,6 +99,7 @@ data/players.json   the ratings table
 src/ratings.js      cost curve, pricing, build validation
 src/sim.js          the possession engine
 src/tournament.js   groups, bracket, placement
+src/scout.js        gauntlets, head-to-heads, per-slot leverage
 web/                page source
 tools/build.js      inlines everything into app.html
 factory/            SPEC (the contract), PLAN (the slices), STATE (the run)
