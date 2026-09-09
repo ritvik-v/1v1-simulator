@@ -79,10 +79,12 @@ export function simulateGame(fighterA, fighterB, seedStr) {
   let poss = 0;
   const opening = `${F[off].manager} wins the check and takes it out first.`;
 
-  const push = (action, text, pts) => {
+  // `extra` carries what a scouting report needs to read back off the log:
+  // who got the rebound, and whether the look was clean.
+  const push = (action, text, pts, extra) => {
     log.push({
       n: poss, off, offName: F[off].manager, action, text,
-      pts: pts || 0, score: [score[0], score[1]],
+      pts: pts || 0, score: [score[0], score[1]], ...(extra || null),
     });
   };
 
@@ -111,13 +113,14 @@ export function simulateGame(fighterA, fighterB, seedStr) {
     const w = [driveU, jumpU, postU].map(u => Math.exp(K.choiceTemp * u));
     const choice = pick3(rand, w);
 
-    let made = false, pts = 0, action, text;
+    let made = false, pts = 0, action, text, flag = null;
 
     if (choice === 0) {
       // DRIVE — worth 1. A big enough quickness edge produces a clean blow-by:
       // no help exists in 1v1, so beating your man IS the whole play. This is
       // what gives speed builds a lane against size.
       const separation = rand() < logistic(K.sepBase + K.sepK * driveSep);
+      if (separation) flag = 'blowby';
       if (!separation) {
         const evade = 0.50 * o.ath + 0.30 * o.frm + 0.20 * o.hnd;
         const wall = 0.55 * d.frm + 0.45 * d.def;
@@ -146,6 +149,7 @@ export function simulateGame(fighterA, fighterB, seedStr) {
       // contest a quick trigger no matter how long his arms are.
       const jumpSep = o.sc - (0.55 * d.def + 0.45 * d.ath);
       const clean = rand() < logistic(K.cleanBase + K.cleanK * jumpSep);
+      if (clean) flag = 'clean';
       const att = 0.82 * o.sc + 0.18 * o.hnd;
       const dfn = clean ? (0.30 * d.def + 0.12 * d.frm) : (0.74 * d.def + 0.26 * d.frm);
       made = rand() < logistic(K.jumpBase + K.jumpK * (att - dfn));
@@ -172,7 +176,7 @@ export function simulateGame(fighterA, fighterB, seedStr) {
 
     if (made) {
       score[off] = Math.min(HARD_CAP, score[off] + pts);
-      push(action, text, pts);
+      push(action, text, pts, { flag });
       const lead = score[off] - score[def];
       if ((score[off] >= TARGET && lead >= 2) || score[off] >= HARD_CAP) break;
       continue; // make it, take it
@@ -181,9 +185,9 @@ export function simulateGame(fighterA, fighterB, seedStr) {
     // 3. Miss — live ball.
     const oreb = (0.55 * o.frm + 0.45 * o.ath) - (0.55 * d.frm + 0.45 * d.ath);
     if (rand() < logistic(K.orebBase + K.orebK * oreb)) {
-      push(action, `${text} ${S.frm.last}-frame rips his own miss back down. Reset.`, 0);
+      push(action, `${text} ${S.frm.last}-frame rips his own miss back down. Reset.`, 0, { flag, reb: 'off' });
     } else {
-      push(action, `${text} ${T.frm.last}-frame boxes out and secures it.`, 0);
+      push(action, `${text} ${T.frm.last}-frame boxes out and secures it.`, 0, { flag, reb: 'def' });
       off = def;
     }
   }

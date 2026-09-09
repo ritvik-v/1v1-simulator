@@ -8,6 +8,7 @@
   --accent:#C4441F; --accent-ink:#FFF3EE; --accent-soft:#F5DED4;
   --court:#1F5E4E; --court-soft:#D3E5DD;
   --gold:#96682A; --gold-soft:#F0E2C8;
+  --viz-win:#0E7A5C; --viz-loss:#C4441F; --viz-grid:#C7CDC3;
   --shadow:0 1px 0 rgba(20,24,26,.06), 0 8px 24px -16px rgba(20,24,26,.5);
   --f-display:"Saira Condensed",Oswald,"Arial Narrow",sans-serif;
   --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
@@ -20,6 +21,7 @@
   --accent:#FF6B3D; --accent-ink:#1A0E08; --accent-soft:#3A1D11;
   --court:#4FBF9A; --court-soft:#12312A;
   --gold:#D9A441; --gold-soft:#33270F;
+  --viz-win:#20A47C; --viz-loss:#EA6134; --viz-grid:#2B3330;
   --shadow:0 1px 0 rgba(0,0,0,.4), 0 12px 28px -18px #000;
 }}
 :root[data-theme="dark"]{
@@ -29,6 +31,7 @@
   --accent:#FF6B3D; --accent-ink:#1A0E08; --accent-soft:#3A1D11;
   --court:#4FBF9A; --court-soft:#12312A;
   --gold:#D9A441; --gold-soft:#33270F;
+  --viz-win:#20A47C; --viz-loss:#EA6134; --viz-grid:#2B3330;
   --shadow:0 1px 0 rgba(0,0,0,.4), 0 12px 28px -18px #000;
 }
 *{box-sizing:border-box}
@@ -89,6 +92,9 @@ section{margin-bottom:34px}
 
 /* ── build bay ── */
 .bay{display:grid;grid-template-columns:minmax(300px,384px) 1fr;gap:22px;align-items:start}
+/* Grid items default to min-width:auto, which lets wide content push a column
+   past its track and shrink-to-fit the whole page on a phone. */
+.bay > *{min-width:0}
 @media (max-width:900px){.bay{grid-template-columns:1fr}}
 .sheet{background:var(--surface);border:1px solid var(--line);position:sticky;top:100px;
   max-height:calc(100vh - 116px);overflow-y:auto}
@@ -225,6 +231,127 @@ dialog::backdrop{background:rgba(8,11,10,.62)}
 .pbp li.score{background:var(--court-soft)}
 .pbp li.score .s{color:var(--ink);font-weight:600}
 .pbp li.turn{color:var(--muted)}
+
+/* ── scouting report ── */
+.report{background:var(--surface);border:1px solid var(--line);margin-top:18px}
+.report-hd{padding:13px 16px;border-bottom:1px solid var(--line);background:var(--surface-2);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.report-hd h3{font-size:19px;text-transform:uppercase;letter-spacing:.05em;margin-right:auto}
+.hero{display:flex;align-items:baseline;gap:12px;padding:16px 16px 6px}
+.hero b{font-family:var(--f-display);font-size:56px;font-weight:800;line-height:.82;
+  font-variant-numeric:tabular-nums}
+.hero .cap{padding:0;border:0;max-width:34ch}
+.hero i{font-style:normal;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);display:block}
+.reads{margin:0;padding:2px 16px 14px;list-style:none;display:flex;flex-direction:column;gap:5px;
+  max-width:70ch}
+.reads li{font-size:13.5px;color:var(--ink-2);padding-left:14px;position:relative}
+.reads li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;
+  background:var(--muted)}
+.vsec{padding:14px 16px;border-top:1px solid var(--line-soft)}
+.vsec h4{margin:0 0 3px;font-family:var(--f-display);font-size:15px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase}
+.vsec p.note{margin:0 0 11px}
+.bars{display:flex;flex-direction:column;gap:4px}
+.bar{display:grid;grid-template-columns:126px 1fr 58px;gap:11px;align-items:center;font-size:13px}
+.bar .lbl{text-align:right;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .val{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:12.5px}
+.track{position:relative;height:19px;background:var(--sunken);border:1px solid var(--line-soft)}
+.track .mid{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--viz-grid)}
+.track .fill{position:absolute;top:2px;bottom:2px;min-width:3px}
+.track .fill.win{background:var(--viz-win);border-radius:0 4px 4px 0}
+.track .fill.loss{background:var(--viz-loss);border-radius:4px 0 0 4px}
+.track .fill.mag{left:2px;background:var(--viz-win);border-radius:0 4px 4px 0}
+.axis{display:grid;grid-template-columns:126px 1fr 58px;gap:11px;margin-top:6px}
+.axis > span{grid-column:2;display:grid;grid-template-columns:1fr auto 1fr;gap:8px;
+  font-family:var(--f-mono);font-size:9.5px;letter-spacing:.09em;color:var(--muted);
+  text-transform:uppercase}
+.axis > span > :nth-child(1){text-align:left}
+.axis > span > :nth-child(2){text-align:center}
+.axis > span > :nth-child(3){text-align:right}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--f-mono);font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.legend i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px}
+.mixrow{display:grid;grid-template-columns:104px minmax(0,1fr) 52px;gap:11px;align-items:center;
+  font-size:13px;padding:3px 0}
+.mixrow .val{text-align:right}
+.mixrow .val{font-family:var(--f-mono);font-size:12px;font-variant-numeric:tabular-nums;
+  color:var(--muted)}
+details.tbl{margin-top:12px}
+.tblscroll{overflow-x:auto;max-width:100%}
+.tblscroll table{min-width:min(100%,320px)}
+details.tbl summary{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--muted);cursor:pointer}
+details.tbl table{margin-top:8px;font-size:12.5px}
+.oppgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(216px,1fr));gap:9px}
+.opp{background:var(--surface);border:1px solid var(--line);padding:10px 12px;text-align:left;
+  cursor:pointer;display:flex;flex-direction:column;gap:4px;border-left:3px solid var(--line)}
+.opp:hover{border-left-color:var(--accent)}
+.opp[aria-pressed="true"]{border-left-color:var(--accent);background:var(--surface-2)}
+.opp b{font-family:var(--f-display);font-size:17px;font-weight:700}
+.opp span{font-size:12px;color:var(--muted)}
+.opp code{font-family:var(--f-mono);font-size:10.5px;color:var(--faint)}
+
+/* ── who you built: radar comp ── */
+.comp{display:grid;grid-template-columns:minmax(0,440px) minmax(200px,270px);gap:26px;
+  align-items:start;justify-content:start}
+.comp > *{min-width:0}
+@media (max-width:720px){.comp{grid-template-columns:1fr}}
+.radar{width:100%;max-width:440px;height:auto;display:block;overflow:visible}
+.radar .ring{fill:none;stroke:var(--viz-grid);stroke-width:1;opacity:.55}
+.radar .spoke{stroke:var(--viz-grid);stroke-width:1;opacity:.45}
+.radar .comp-poly{fill:none;stroke:var(--muted);stroke-width:2;stroke-dasharray:5 4;
+  stroke-linejoin:round}
+.radar .you-poly{fill:var(--accent);fill-opacity:.20;stroke:var(--accent);stroke-width:2.5;
+  stroke-linejoin:round}
+.radar .dot-you{fill:var(--accent)}
+.radar .ax{fill:var(--ink);font-family:var(--f-display);font-size:13px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase}
+.radar .v-you{fill:var(--accent);font-family:var(--f-mono);font-size:12px;font-weight:600}
+.radar .v-them{fill:var(--muted);font-family:var(--f-mono);font-size:12px}
+.matchcard{background:var(--sunken);border:1px solid var(--line);padding:13px 14px;
+  display:flex;flex-direction:column;gap:9px}
+.matchcard .who{font-family:var(--f-display);font-size:22px;font-weight:800;line-height:1.05}
+.matchcard .sub{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;color:var(--muted);
+  text-transform:uppercase}
+.matchcard .pctbig{font-family:var(--f-display);font-size:40px;font-weight:800;line-height:.9;
+  font-variant-numeric:tabular-nums;color:var(--accent)}
+.altlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.altlist li{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;
+  border-top:1px solid var(--line-soft);padding-top:5px}
+.altlist b{font-weight:500}
+.altlist span{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.archline{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:2px}
+.archline b{font-family:var(--f-display);font-size:21px;font-weight:700}
+
+/* ── phone ── */
+@media (max-width:640px){
+  .bar,.axis{grid-template-columns:88px minmax(0,1fr) 52px;gap:8px}
+  .bar{font-size:12.5px}
+  .bar .val{font-size:11.5px}
+  .axis > span{font-size:8.5px;letter-spacing:.04em;gap:4px}
+  .mixrow{grid-template-columns:88px minmax(0,1fr) 40px;gap:8px;font-size:12.5px}
+  .mixrow .val{font-size:11px}
+  .hero{flex-wrap:wrap;gap:8px}
+  .hero b{font-size:44px}
+  .vsec,.report-hd,.hero{padding-left:13px;padding-right:13px}
+  .reads{padding-left:13px;padding-right:13px}
+  .head h2{font-size:23px}
+  .board-in{gap:12px;padding:9px 13px}
+  .mark b{font-size:19px}
+  main{padding:16px 13px 60px}
+  .pickrow{grid-template-columns:44px minmax(0,1fr);gap:10px}
+  .pick-r{grid-column:2;text-align:left}
+  .pick-n{font-size:30px}
+  .matchcard .pctbig{font-size:34px}
+  .vsec tbody td,.vsec thead th{padding:6px 7px;font-size:12px}
+  .gcard tbody td,.gcard thead th{padding:6px 8px}
+  .series{grid-template-columns:1fr}
+  .oppgrid{grid-template-columns:1fr}
+  dialog{width:calc(100% - 16px)}
+  .pbp li{grid-template-columns:26px minmax(0,1fr) 42px;gap:7px;font-size:12.5px}
+  .dlg-bd{padding:6px 13px 16px}
+}
 
 /* ── setup + misc ── */
 .card{background:var(--surface);border:1px solid var(--line);padding:18px}
@@ -440,10 +567,12 @@ function simulateGame(fighterA, fighterB, seedStr) {
   let poss = 0;
   const opening = `${F[off].manager} wins the check and takes it out first.`;
 
-  const push = (action, text, pts) => {
+  // `extra` carries what a scouting report needs to read back off the log:
+  // who got the rebound, and whether the look was clean.
+  const push = (action, text, pts, extra) => {
     log.push({
       n: poss, off, offName: F[off].manager, action, text,
-      pts: pts || 0, score: [score[0], score[1]],
+      pts: pts || 0, score: [score[0], score[1]], ...(extra || null),
     });
   };
 
@@ -472,13 +601,14 @@ function simulateGame(fighterA, fighterB, seedStr) {
     const w = [driveU, jumpU, postU].map(u => Math.exp(K.choiceTemp * u));
     const choice = pick3(rand, w);
 
-    let made = false, pts = 0, action, text;
+    let made = false, pts = 0, action, text, flag = null;
 
     if (choice === 0) {
       // DRIVE — worth 1. A big enough quickness edge produces a clean blow-by:
       // no help exists in 1v1, so beating your man IS the whole play. This is
       // what gives speed builds a lane against size.
       const separation = rand() < logistic(K.sepBase + K.sepK * driveSep);
+      if (separation) flag = 'blowby';
       if (!separation) {
         const evade = 0.50 * o.ath + 0.30 * o.frm + 0.20 * o.hnd;
         const wall = 0.55 * d.frm + 0.45 * d.def;
@@ -507,6 +637,7 @@ function simulateGame(fighterA, fighterB, seedStr) {
       // contest a quick trigger no matter how long his arms are.
       const jumpSep = o.sc - (0.55 * d.def + 0.45 * d.ath);
       const clean = rand() < logistic(K.cleanBase + K.cleanK * jumpSep);
+      if (clean) flag = 'clean';
       const att = 0.82 * o.sc + 0.18 * o.hnd;
       const dfn = clean ? (0.30 * d.def + 0.12 * d.frm) : (0.74 * d.def + 0.26 * d.frm);
       made = rand() < logistic(K.jumpBase + K.jumpK * (att - dfn));
@@ -533,7 +664,7 @@ function simulateGame(fighterA, fighterB, seedStr) {
 
     if (made) {
       score[off] = Math.min(HARD_CAP, score[off] + pts);
-      push(action, text, pts);
+      push(action, text, pts, { flag });
       const lead = score[off] - score[def];
       if ((score[off] >= TARGET && lead >= 2) || score[off] >= HARD_CAP) break;
       continue; // make it, take it
@@ -542,9 +673,9 @@ function simulateGame(fighterA, fighterB, seedStr) {
     // 3. Miss — live ball.
     const oreb = (0.55 * o.frm + 0.45 * o.ath) - (0.55 * d.frm + 0.45 * d.ath);
     if (rand() < logistic(K.orebBase + K.orebK * oreb)) {
-      push(action, `${text} ${S.frm.last}-frame rips his own miss back down. Reset.`, 0);
+      push(action, `${text} ${S.frm.last}-frame rips his own miss back down. Reset.`, 0, { flag, reb: 'off' });
     } else {
-      push(action, `${text} ${T.frm.last}-frame boxes out and secures it.`, 0);
+      push(action, `${text} ${T.frm.last}-frame boxes out and secures it.`, 0, { flag, reb: 'def' });
       off = def;
     }
   }
@@ -767,6 +898,189 @@ function stripLogs(t) {
   };
 }
 
+
+// Scouting: run a build against opponents many times and report what happened.
+//
+// A single game tells you almost nothing — the engine is stochastic by design.
+// Several hundred games tell you whether a build is actually good, and reading
+// the play-by-play back tells you WHY, which is the part you can act on.
+
+
+const DEFAULT_RUNS = 400;
+
+// One head-to-head, aggregated.
+function headToHead(a, b, runs = DEFAULT_RUNS, seedStr = 'scout') {
+  const stat = () => ({ pts: 0, jumper: 0, drive: 0, post: 0, made: 0, shots: 0,
+                        turnovers: 0, blocked: 0, oreb: 0, clean: 0, blowby: 0 });
+  const s = [stat(), stat()];
+  let wins = 0, poss = 0, seriesWins = 0;
+  const scores = [0, 0];
+
+  for (let i = 0; i < runs; i++) {
+    const g = simulateGame(a, b, `${seedStr}#${i}`);
+    if (g.winner === 0) wins++;
+    scores[0] += g.score[0]; scores[1] += g.score[1];
+    poss += g.possessions;
+    for (const l of g.log) {
+      const t = s[l.off];
+      t.pts += l.pts;
+      if (l.action === 'turnover') { t.turnovers++; continue; }
+      if (l.action === 'block') { t.blocked++; continue; }
+      t.shots++; t[l.action]++;
+      if (l.pts) t.made++;
+      if (l.reb === 'off') t.oreb++;
+      if (l.flag === 'clean') t.clean++;
+      if (l.flag === 'blowby') t.blowby++;
+    }
+  }
+  for (let i = 0; i < Math.ceil(runs / 4); i++) {
+    if (simulateSeries(a, b, `${seedStr}-bo3#${i}`).winner === 0) seriesWins++;
+  }
+
+  const per = t => ({
+    ppg: t.pts / runs,
+    fg: t.shots ? t.made / t.shots : 0,
+    mix: { jumper: t.shots ? t.jumper / t.shots : 0, drive: t.shots ? t.drive / t.shots : 0,
+           post: t.shots ? t.post / t.shots : 0 },
+    turnovers: t.turnovers / runs, blocked: t.blocked / runs, oreb: t.oreb / runs,
+    cleanRate: t.jumper ? t.clean / t.jumper : 0,
+    blowbyRate: t.drive ? t.blowby / t.drive : 0,
+  });
+
+  return {
+    runs, winRate: wins / runs, seriesRate: seriesWins / Math.ceil(runs / 4),
+    avgScore: [scores[0] / runs, scores[1] / runs],
+    possessions: poss / runs,
+    you: per(s[0]), them: per(s[1]),
+  };
+}
+
+// The headline number: how the build holds up across a spread of archetypes.
+function gauntlet(fighter, opponents, runs = 200, seedStr = 'gauntlet') {
+  const rows = opponents.map(o => {
+    const h = headToHead(fighter, o, runs, `${seedStr}|${o.id}`);
+    return { id: o.id, name: o.manager, winRate: h.winRate,
+             avgScore: h.avgScore, possessions: h.possessions };
+  });
+  const overall = rows.reduce((s, r) => s + r.winRate, 0) / rows.length;
+  const sorted = [...rows].sort((x, y) => y.winRate - x.winRate);
+  return { rows, overall, best: sorted[0], worst: sorted[sorted.length - 1] };
+}
+
+// Which of the five picks is actually carrying the build? Replace one slot with
+// a replacement-level player and see how far the win rate falls. A slot worth
+// almost nothing is a slot you are overpaying for.
+const REPLACEMENT = 68;
+
+function leverage(build, pool, opponents, toFighter, runs = 120, seedStr = 'lev') {
+  const byId = pool instanceof Map ? pool : new Map(pool.map(p => [p.id, p]));
+  const base = gauntlet(toFighter(build, pool), opponents, runs, seedStr + '|base').overall;
+  const used = new Set(Object.values(build.picks));
+
+  return SLOTS.map(slot => {
+    // Cheapest player near replacement level who is not already in the build.
+    const filler = [...byId.values()]
+      .filter(p => !used.has(p.id) || p.id === build.picks[slot.key])
+      .reduce((best, p) => Math.abs(p[slot.key] - REPLACEMENT) <
+                           Math.abs(best[slot.key] - REPLACEMENT) ? p : best);
+    const swapped = { ...build, picks: { ...build.picks, [slot.key]: filler.id } };
+    const after = gauntlet(toFighter(swapped, pool), opponents, runs, seedStr + '|' + slot.key).overall;
+    const current = byId.get(build.picks[slot.key]);
+    return {
+      slot: slot.key, label: slot.label,
+      player: current.name, rating: current[slot.key], cost: costOf(current[slot.key]),
+      swapTo: filler.name, swapRating: filler[slot.key],
+      drop: base - after,
+      perPoint: (base - after) / Math.max(1, costOf(current[slot.key]) - costOf(filler[slot.key])),
+    };
+  }).sort((a, b) => b.drop - a.drop);
+}
+
+function grade(overall) {
+  const o = overall * 100;
+  return o >= 65 ? 'Strong' : o >= 52 ? 'Solid' : o >= 45 ? 'Middling' : 'Struggling';
+}
+
+// Plain-language read on a set of gauntlet results.
+function readout(g, h) {
+  const pct = x => Math.round(x * 100);
+  const lines = [];
+  const o = pct(g.overall);
+  lines.push(`${grade(g.overall)} — wins ${o}% across the field.`);
+  lines.push(`Best matchup: ${g.best.name} (${pct(g.best.winRate)}%). Worst: ${g.worst.name} (${pct(g.worst.winRate)}%).`);
+  if (h) {
+    const m = h.you.mix;
+    const top = m.jumper >= m.drive && m.jumper >= m.post ? 'jumpers'
+              : m.drive >= m.post ? 'drives' : 'post-ups';
+    lines.push(`Your offense runs through ${top} (${pct(Math.max(m.jumper, m.drive, m.post))}% of shots), shooting ${pct(h.you.fg)}%.`);
+    if (h.you.turnovers > h.them.turnovers * 1.4) {
+      lines.push(`Ball security is a problem — you cough it up ${h.you.turnovers.toFixed(1)} times a game to their ${h.them.turnovers.toFixed(1)}.`);
+    }
+    if (h.them.cleanRate > 0.45) {
+      lines.push(`You are giving up clean looks on ${pct(h.them.cleanRate)}% of their jumpers — that is a closeout problem.`);
+    }
+    if (h.you.oreb > h.them.oreb * 1.4) {
+      lines.push(`Your frame is winning the glass: ${h.you.oreb.toFixed(1)} second chances a game.`);
+    }
+  }
+  return lines;
+}
+
+/* ── Who did you just build? ───────────────────────────────────────────────
+   Root-mean-square difference across the five ratings. The scale is anchored
+   on measurement, not taste: two randomly drawn players in this pool sit at
+   RMS 18.2, so that distance is defined as a 50% match — "no more alike than
+   two players picked at random". */
+const MATCH_SCALE = 36;
+
+function profileDistance(a, b) {
+  return Math.sqrt(SLOT_KEYS.reduce((s, k) => s + Math.pow(a[k] - b[k], 2), 0) / SLOT_KEYS.length);
+}
+
+function matchPct(distance) {
+  return Math.max(0, Math.min(1, 1 - distance / MATCH_SCALE));
+}
+
+function ratingsOf(picks, byId) {
+  const r = {};
+  for (const k of SLOT_KEYS) r[k] = byId.get(picks[k])[k];
+  return r;
+}
+
+function buildRatings(picks, pool) {
+  return ratingsOf(picks, pool instanceof Map ? pool : new Map(pool.map(p => [p.id, p])));
+}
+
+// Closest real players by raw profile. The build's own five sources are
+// excluded from being their own comp only where they would be trivially close
+// on one axis — they are still eligible, because "you basically built Kawhi"
+// is a true and useful thing to say.
+function comps(ratings, pool, n = 4) {
+  return pool
+    .map(p => { const d = profileDistance(ratings, p); return { player: p, distance: d, match: matchPct(d) }; })
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, n);
+}
+
+// Which archetype is this, and how cleanly? `archetypes` is [{name, ratings}].
+function archetypeOf(ratings, archetypes) {
+  const scored = archetypes
+    .map(a => { const d = profileDistance(ratings, a.ratings); return { name: a.name, tag: a.tag, distance: d, match: matchPct(d) }; })
+    .sort((a, b) => a.distance - b.distance);
+  return { best: scored[0], runnerUp: scored[1], all: scored };
+}
+
+// How lopsided is the build? Useful copy: a flat build and a spiky one that
+// cost the same play very differently.
+function shape(ratings) {
+  const vals = SLOT_KEYS.map(k => ratings[k]);
+  const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+  const sd = Math.sqrt(vals.reduce((s, v) => s + (v - mean) * (v - mean), 0) / vals.length);
+  const top = SLOT_KEYS.reduce((a, k) => ratings[k] > ratings[a] ? k : a, SLOT_KEYS[0]);
+  const bottom = SLOT_KEYS.reduce((a, k) => ratings[k] < ratings[a] ? k : a, SLOT_KEYS[0]);
+  return { mean, sd, top, bottom, spread: Math.max(...vals) - Math.min(...vals) };
+}
+
 </script>
 <script>
 (function(){
@@ -786,6 +1100,7 @@ let db = null, live = false;
 let S = {
   tab: 'build', slot: 'sc', q: '', era: 'all', sortBy: 'rating',
   league: null, builds: {}, tourney: null, me: null, busy: false, note: '',
+  lab: { picks: {}, result: null, busy: false },
 };
 
 /* ── identity ───────────────────────────────────────────────────────────── */
@@ -831,6 +1146,12 @@ async function connect(){
   db.doc('tournament/latest').onSnapshot(s => { S.tourney = s.exists ? s.data() : null; render(); }, () => {});
 }
 
+/* ── the field ───────────────────────────────────────────────────────────
+   Eight sparring partners, every one cap-legal with five distinct sources, and
+   deliberately spread: the field averages 37% to 60% against itself, so a
+   gauntlet score means something. */
+const PRESETS = [{"name": "The Sniper","tag": "Elite shot-making with size and hops. Cannot dribble, will not guard you.","picks": {"sc": "curry16","hnd": "klay16","frm": "kp18","def": "book22","ath": "zion21"}},{"name": "The Wall","tag": "All frame and rim protection. Cannot create a shot to save his life.","picks": {"sc": "stockton90","hnd": "duncan03","frm": "shaq00","def": "hakeem94","ath": "isiah89"}},{"name": "The Blur","tag": "First step and handle, no size at all.","picks": {"sc": "drob95","hnd": "kyrie17","frm": "maxey24","def": "boogie16","ath": "giannis21"}},{"name": "The Lockdown","tag": "Built to stop you. Scores just enough to punish you for it.","picks": {"sc": "brand06","hnd": "hakeem94","frm": "jordan90","def": "wemby25","ath": "pippen94"}},{"name": "The Bully","tag": "Backs you down until something gives.","picks": {"sc": "luka24","hnd": "reggie95","frm": "shaq00","def": "drexler92","ath": "kareem77"}},{"name": "The Prototype","tag": "No weakness, no elite slot. The build everyone talks themselves into.","picks": {"sc": "wemby25","hnd": "lebron13","frm": "jordan90","def": "joshsmith10","ath": "ad20"}},{"name": "The Iso Handler","tag": "Breaks you down off the dribble every single possession.","picks": {"sc": "kobe06","hnd": "kyrie17","frm": "ray01","def": "blake14","ath": "shaq00"}},{"name": "The Freak","tag": "Athletic monster with real length. Raw tools over polish.","picks": {"sc": "brand06","hnd": "kg04","frm": "magic87","def": "kobe06","ath": "lebron13"}}];
+
 /* ── build codes ────────────────────────────────────────────────────────
    A shared link only reaches people inside your Claude organization. A league
    is twelve friends, so a build has to survive a text message too: this is the
@@ -874,13 +1195,17 @@ function fightersFromBuilds(){
 function paintBoard(){
   const n = lockedList().length, total = managers().length || 12;
   $('mk-name').textContent = S.league ? S.league.name : 'Blacktop Draft';
-  $('mk-sub').textContent = S.league ? '1v1 for draft order' : 'set up your league';
+  $('mk-sub').textContent = S.league ? '1v1 for draft order' : 'build · test · draft';
   $('st-cap').textContent = budget();
   $('st-locked').textContent = n + '/' + total;
   $('st-me').textContent = S.me != null && managers()[S.me] ? managers()[S.me] : '—';
+  // Lock count and "you" are league facts; in the sandbox they are just noise.
+  const leagueOnly = S.league ? '' : 'none';
+  $('st-locked').parentElement.style.display = leagueOnly;
+  $('st-me').parentElement.style.display = leagueOnly;
   const p = $('st-phase');
   let cls = 'pill', txt = 'Building';
-  if (!S.league) { txt = 'No league'; }
+  if (!S.league) { txt = 'Sandbox'; }
   else if (S.tourney) { cls = 'pill live'; txt = 'Order set'; }
   else if (n === total) { cls = 'pill hot'; txt = 'Ready to run'; }
   p.className = cls;
@@ -888,10 +1213,11 @@ function paintBoard(){
 }
 
 const TABS = () => {
-  const t = [{ id:'build', label:'Build' }, { id:'league', label:'League' },
-             { id:'tournament', label:'Tournament' }];
+  const t = [{ id:'lab', label:'Lab' }];
+  if (S.league) t.push({ id:'build', label:'Build' }, { id:'league', label:'League' },
+                       { id:'tournament', label:'Tournament' });
   if (S.tourney) t.push({ id:'board', label:'Draft Board' });
-  t.push({ id:'setup', label:'Setup' });
+  t.push({ id:'setup', label:S.league ? 'Setup' : 'Start a League' });
   return t;
 };
 function paintTabs(){
@@ -962,56 +1288,47 @@ function screenIdentify(){
         </button>`; }).join('')}</div></section>`;
 }
 
-function screenBuild(){
-  const b = myBuild();
-  const picks = b ? b.picks : {};
+function capSheet(picks, opts){
   const v = priced(picks);
-  const locked = b && b.locked;
   const spent = v.total, rem = budget() - spent, over = spent > budget();
   const pct = Math.min(100, Math.round(spent / budget() * 100));
-
-  const sheet = `<aside class="sheet">
-    <div class="sheet-hd"><h3>${esc(managers()[S.me])}</h3></div>
+  return `<aside class="sheet">
+    <div class="sheet-hd"><h3>${esc(opts.title)}</h3></div>
     <div class="cap">
       <div class="cap-row"><b class="num" style="color:${over ? 'var(--accent)' : 'inherit'}">${spent}</b>
         <small>${over ? (spent - budget()) + ' over' : rem + ' left'} · cap ${budget()}</small></div>
       <div class="meter"><i class="${over ? 'over' : ''}" style="width:${pct}%"></i></div>
     </div>
-    ${SLOTS.map(s => {
-      const line = v.lines.find(l => l.slot === s.key);
+    ${SLOTS.map(sl => {
+      const line = v.lines.find(l => l.slot === sl.key);
       const p = line.empty ? null : line.player;
-      return `<button class="slot" data-slot="${s.key}" aria-current="${S.slot === s.key}">
-        <span class="slot-k">${s.label}</span>
+      return `<button class="slot" data-slot="${sl.key}" aria-current="${S.slot === sl.key}">
+        <span class="slot-k">${sl.label}</span>
         <span class="slot-v${p ? '' : ' empty'}">${p ? esc(p.name) : 'Not picked'}</span>
-        <span class="slot-sub">${p ? esc(p.season) + ' · ' + esc(p.team) : esc(s.blurb)}</span>
+        <span class="slot-sub">${p ? esc(p.season) + ' · ' + esc(p.team) : esc(sl.blurb)}</span>
         <span class="slot-r">${p ? `<span class="rating">${line.rating}</span>
           <span class="price num">${line.cost}</span>` : ''}</span></button>`;
     }).join('')}
     <div class="sheet-ft">
       ${v.errors.map(e => `<p class="warn">${esc(e[0].toUpperCase() + e.slice(1))}</p>`).join('')}
-      ${locked
-        ? `<span class="pill live" style="justify-content:center;padding:9px"><span class="dot"></span><span>Locked in</span></span>
-           <p class="note" style="margin:0">Send this to your commissioner:</p>
-           <code class="num" style="display:block;background:var(--sunken);border:1px solid var(--line);
-             padding:7px 9px;font-size:12px;word-break:break-all">${esc(encodeBuild(S.me, picks))}</code>
-           <button class="btn ghost sm" data-act="copy-code">Copy build code</button>
-           <button class="btn ghost" data-act="unlock">Unlock and edit</button>`
-        : `<button class="btn hot" data-act="lock" ${v.ok ? '' : 'disabled'}>Lock in build</button>
-           <p class="note">${v.ok ? 'Once you lock, your build is final until you unlock it.' : 'Fill all five slots inside the cap to lock in.'}</p>`}
+      ${opts.footer}
     </div></aside>`;
+}
 
-  const slot = SLOTS.find(s => s.key === S.slot);
+function poolTable(picks, opts){
+  const v = priced(picks);
+  const slot = SLOTS.find(sl => sl.key === S.slot);
   const q = S.q.toLowerCase();
+  const locked = opts.locked;
   let rows = POOL.filter(p => (S.era === 'all' || p.era === S.era) &&
     (!q || p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q)));
   rows.sort((a, z) => S.sortBy === 'cost' ? costOf(a[S.slot]) - costOf(z[S.slot])
                     : S.sortBy === 'name' ? (a.name < z.name ? -1 : 1)
                     : z[S.slot] - a[S.slot]);
   const otherSpend = v.lines.filter(l => l.slot !== S.slot && !l.empty)
-                            .reduce((s, l) => s + l.cost, 0);
+                            .reduce((s2, l) => s2 + l.cost, 0);
   const canSpend = budget() - otherSpend;
-
-  const pool = `<div class="pool">
+  return `<div class="pool">
     <div class="pool-hd"><h3>${esc(slot.label)}</h3>
       <input type="search" id="in-q" placeholder="Search 144 players" value="${esc(S.q)}" ${locked ? 'disabled' : ''}>
       <select id="in-era" ${locked ? 'disabled' : ''}>
@@ -1046,13 +1363,240 @@ function screenBuild(){
           ? '<span class="pill">Used</span>'
           : `<button class="btn sm ${afford ? 'hot' : 'ghost'}" data-pick="${p.id}">${afford ? 'Take' : 'Over cap'}</button>`}</td></tr>`;
     }).join('')}</tbody></table></div></div>`;
+}
 
+function screenBuild(){
+  const b = myBuild();
+  const picks = b ? b.picks : {};
+  const v = priced(picks);
+  const locked = b && b.locked;
+  const footer = locked
+    ? `<span class="pill live" style="justify-content:center;padding:9px"><span class="dot"></span><span>Locked in</span></span>
+       <p class="note" style="margin:0">Send this to your commissioner:</p>
+       <code class="num" style="display:block;background:var(--sunken);border:1px solid var(--line);
+         padding:7px 9px;font-size:12px;word-break:break-all;overflow-wrap:anywhere">${esc(encodeBuild(S.me, picks))}</code>
+       <button class="btn ghost sm" data-act="copy-code">Copy build code</button>
+       <button class="btn ghost" data-act="unlock">Unlock and edit</button>`
+    : `<button class="btn hot" data-act="lock" ${v.ok ? '' : 'disabled'}>Lock in build</button>
+       <button class="btn ghost sm" data-act="to-lab">Test this in the Lab</button>
+       <p class="note">${v.ok ? 'Once you lock, your build is final until you unlock it.' : 'Fill all five slots inside the cap to lock in.'}</p>`;
   return `<section><p class="eyebrow">${esc(S.league.name)} · Your build</p>
     <div class="head"><h2>Build Your Guy</h2>
       <p class="note" style="max-width:46ch">Take one attribute from each of five players.
         Spend up to ${budget()}. Nobody sees this until all twelve lock in.</p></div>
     <div class="courtline" style="margin-bottom:16px"></div>
-    <div class="bay">${sheet}${pool}</div></section>`;
+    <div class="bay">${capSheet(picks, { title: managers()[S.me], footer })}${poolTable(picks, { locked })}</div></section>`;
+}
+
+function labFighters(){
+  return PRESETS.map((p, i) =>
+    toFighter({ id: 'preset' + i, manager: p.name, picks: p.picks }, POOL));
+}
+
+function pctBar(rate){
+  const w = Math.abs(rate - 0.5) * 200;
+  return `<div class="track"><div class="mid"></div>
+    <div class="fill ${rate >= 0.5 ? 'win' : 'loss'}"
+      style="${rate >= 0.5 ? 'left:50%' : 'right:50%'};width:calc(${w.toFixed(1)}% - 1px)"></div></div>`;
+}
+const pc = x => Math.round(x * 100);
+
+// Five axes on one shared 0-99 scale is the case a radar is actually good for.
+// Offense sits top-right, the physical and defensive slots bottom-left.
+const RADAR_AXES = ['sc', 'hnd', 'ath', 'def', 'frm'];
+
+function radarSvg(you, them, themLabel){
+  const CX = 232, CY = 210, R = 116, MAX = 99;
+  const pt = (i, frac) => {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / RADAR_AXES.length;
+    return [CX + Math.cos(a) * R * frac, CY + Math.sin(a) * R * frac];
+  };
+  const poly = vals => RADAR_AXES.map((k, i) => pt(i, Math.max(0.04, vals[k] / MAX)).map(n => n.toFixed(1)).join(',')).join(' ');
+  const rings = [0.25, 0.5, 0.75, 1].map(f =>
+    `<polygon class="ring" points="${RADAR_AXES.map((_, i) => pt(i, f).map(n => n.toFixed(1)).join(',')).join(' ')}"></polygon>`).join('');
+  const spokes = RADAR_AXES.map((_, i) => {
+    const [x, y] = pt(i, 1);
+    return `<line class="spoke" x1="${CX}" y1="${CY}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"></line>`;
+  }).join('');
+  const labels = RADAR_AXES.map((k, i) => {
+    const [lx, ly] = pt(i, 1.30);
+    const anchor = Math.abs(lx - CX) < 8 ? 'middle' : lx > CX ? 'start' : 'end';
+    const dy = ly < CY - 40 ? -6 : ly > CY + 40 ? 14 : 0;
+    const short = SLOTS.find(sl => sl.key === k).short;
+    return `<text class="ax" x="${lx.toFixed(1)}" y="${(ly + dy).toFixed(1)}" text-anchor="${anchor}">${short}</text>
+      <text class="v-you" x="${lx.toFixed(1)}" y="${(ly + dy + 15).toFixed(1)}" text-anchor="${anchor}">${you[k]}</text>
+      <text class="v-them" x="${lx.toFixed(1)}" y="${(ly + dy + 29).toFixed(1)}" text-anchor="${anchor}">${them[k]}</text>`;
+  }).join('');
+  const dots = RADAR_AXES.map((k, i) => {
+    const [x, y] = pt(i, Math.max(0.04, you[k] / MAX));
+    return `<circle class="dot-you" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5"></circle>`;
+  }).join('');
+  return `<svg class="radar" viewBox="0 0 464 420" role="img"
+      aria-label="Your build against ${esc(themLabel)}, rated across all five slots">
+    <g>${rings}${spokes}</g>
+    <polygon class="comp-poly" points="${poly(them)}"></polygon>
+    <polygon class="you-poly" points="${poly(you)}"></polygon>
+    ${dots}${labels}</svg>`;
+}
+
+function compSection(picks){
+  const you = buildRatings(picks, POOL);
+  const archs = PRESETS.map(p => ({ name: p.name, tag: p.tag, ratings: buildRatings(p.picks, POOL) }));
+  const arch = archetypeOf(you, archs);
+  const list = comps(you, POOL, 4);
+  const top = list[0];
+  const them = { sc: top.player.sc, hnd: top.player.hnd, frm: top.player.frm,
+                 def: top.player.def, ath: top.player.ath };
+  const sh = shape(you);
+  const lbl = k => SLOTS.find(sl => sl.key === k).label;
+  return `<div class="vsec"><h4>Who you built</h4>
+    <p class="note">Your five ratings against the closest real player in the pool. Match is scored on
+      how far apart the two profiles sit — two players drawn at random from this pool score 50%.</p>
+    <div class="archline"><span class="sub" style="font-family:var(--f-mono);font-size:10.5px;
+      letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Archetype</span>
+      <b>${esc(arch.best.name)}</b>
+      <span class="num" style="color:var(--accent)">${pc(arch.best.match)}% match</span>
+      <span class="note" style="margin:0">Next closest: ${esc(arch.runnerUp.name)} at ${pc(arch.runnerUp.match)}%</span></div>
+    <p class="note" style="margin:0 0 12px">${esc(arch.best.tag)}
+      Your build peaks at ${esc(lbl(sh.top))} (${you[sh.top]}) and bottoms out at
+      ${esc(lbl(sh.bottom))} (${you[sh.bottom]}) — a ${sh.spread}-point spread.</p>
+    <div class="comp">
+      <div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Your build</span>
+          <span><i style="background:var(--muted)"></i>${esc(top.player.name)}</span></div>
+        ${radarSvg(you, them, top.player.name)}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="matchcard">
+          <span class="sub">Closest player</span>
+          <span class="who">${esc(top.player.name)}</span>
+          <span class="sub">${esc(top.player.season)} · ${esc(top.player.team)}</span>
+          <span class="pctbig num">${pc(top.match)}%</span>
+          <span class="sub" style="letter-spacing:.06em">profile match</span>
+          <span class="note" style="margin:0">${esc(top.player.note)}</span>
+        </div>
+        <div><p class="sub" style="font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;
+          text-transform:uppercase;color:var(--muted);margin:0 0 6px">Also in the neighbourhood</p>
+          <ul class="altlist">${list.slice(1).map(c => `<li><b>${esc(c.player.name)}</b>
+            <span>${pc(c.match)}%</span></li>`).join('')}</ul></div>
+      </div>
+    </div>
+    <details class="tbl"><summary>Show as a table</summary>
+      <div class="tblscroll"><table><thead><tr><th>Slot</th><th class="r">You</th>
+        <th class="r">${esc(top.player.name.split(' ').slice(-1)[0])}</th><th class="r">Diff</th></tr></thead>
+        <tbody>${SLOTS.map(sl => { const d = you[sl.key] - them[sl.key];
+          return `<tr><td>${esc(sl.label)}</td><td class="r num">${you[sl.key]}</td>
+          <td class="r num">${them[sl.key]}</td>
+          <td class="r num">${d > 0 ? '+' : d < 0 ? '−' : ''}${Math.abs(d) || '—'}</td></tr>`;
+        }).join('')}</tbody></table></div></details></div>`;
+}
+
+function reportView(r){
+  const g = r.gauntlet, h = r.h2h, lev = r.leverage;
+  const worst = Math.max(...lev.map(l => Math.abs(l.drop)), 0.05);
+  const mix = h.you.mix;
+  return `<div class="report">
+    <div class="report-hd"><h3>Scouting Report</h3>
+      <span class="pill">${r.runs} games per matchup</span>
+      <button class="btn ghost sm" data-act="rescout">Run it again</button></div>
+
+    <div class="hero"><b class="num" style="color:${g.overall >= 0.5 ? 'var(--viz-win)' : 'var(--viz-loss)'}">${pc(g.overall)}%</b>
+      <span class="cap"><i>${esc(grade(g.overall))} · wins against the field</i>
+        <span style="font-size:13px;color:var(--ink-2)">Averaged across all eight
+        archetypes, each of them built to the same ${budget()}-point cap.</span></span></div>
+    <ul class="reads">${r.readout.slice(1).map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+
+    ${compSection(S.lab.picks)}
+
+    <div class="vsec"><h4>Matchup by matchup</h4>
+      <p class="note">Win rate against each archetype. The centre line is an even fight.</p>
+      <div class="legend">
+        <span><i style="background:var(--viz-win)"></i>You win more</span>
+        <span><i style="background:var(--viz-loss)"></i>You lose more</span></div>
+      <div class="bars">${g.rows.map(row => `<div class="bar">
+        <span class="lbl">${esc(row.name)}</span>
+        ${pctBar(row.winRate)}
+        <span class="val" style="color:${row.winRate >= 0.5 ? 'var(--viz-win)' : 'var(--viz-loss)'}">${pc(row.winRate)}%</span>
+      </div>`).join('')}</div>
+      <div class="axis"><span><span>0%</span><span>even</span><span>100%</span></span></div>
+      <details class="tbl"><summary>Show as a table</summary>
+        <div class="tblscroll"><table><thead><tr><th>Opponent</th><th class="r">Win rate</th><th class="r">Avg score</th>
+          <th class="r">Possessions</th></tr></thead><tbody>
+          ${g.rows.map(row => `<tr><td>${esc(row.name)}</td>
+            <td class="r num">${pc(row.winRate)}%</td>
+            <td class="r num">${row.avgScore[0].toFixed(1)}-${row.avgScore[1].toFixed(1)}</td>
+            <td class="r num">${row.possessions.toFixed(0)}</td></tr>`).join('')}
+        </tbody></table></div></details></div>
+
+    <div class="vsec"><h4>Which picks are carrying you</h4>
+      <p class="note">What each pick is worth next to a replacement-level player in that slot.
+        A pick below the line is worse than a cheap alternative — you are paying for nothing.</p>
+      <div class="legend">
+        <span><i style="background:var(--viz-win)"></i>Earning its cost</span>
+        <span><i style="background:var(--viz-loss)"></i>Costing you wins</span></div>
+      <div class="bars">${lev.map(l => {
+        const w = Math.min(48, Math.abs(l.drop) / worst * 48);
+        const up = l.drop >= 0;
+        return `<div class="bar">
+        <span class="lbl">${esc(l.label)}</span>
+        <div class="track"><div class="mid"></div>
+          <div class="fill ${up ? 'win' : 'loss'}"
+            style="${up ? 'left:50%' : 'right:50%'};width:calc(${w.toFixed(1)}% - 1px)"></div></div>
+        <span class="val" style="color:${up ? 'var(--viz-win)' : 'var(--viz-loss)'}">${pc(l.drop) === 0 ? 'even' : (up ? '+' : '\u2212') + Math.abs(pc(l.drop)) + ' pts'}</span>
+      </div>`; }).join('')}</div>
+      <div class="axis"><span><span>below replacement</span><span>even</span><span>carrying you</span></span></div>
+      <details class="tbl"><summary>Show as a table</summary>
+        <div class="tblscroll"><table><thead><tr><th>Slot</th><th>Your pick</th><th class="r">Rating</th>
+          <th class="r">Cost</th><th class="r">Worth</th></tr></thead><tbody>
+          ${lev.map(l => `<tr><td>${esc(l.label)}</td><td>${esc(l.player)}</td>
+            <td class="r num">${l.rating}</td><td class="r num">${l.cost}</td>
+            <td class="r num">${pc(l.drop) === 0 ? 'even' : (l.drop >= 0 ? '+' : '\u2212') + Math.abs(pc(l.drop)) + ' pts'}</td></tr>`).join('')}
+        </tbody></table></div></details></div>
+
+    <div class="vsec"><h4>How you score</h4>
+      <p class="note">Share of your shots, and how they fall, against ${esc(r.h2hName)} over ${r.runs} games.</p>
+      ${[['Jumpers (2s)', mix.jumper], ['Drives (1s)', mix.drive], ['Post-ups (1s)', mix.post]]
+        .map(([label, val]) => `<div class="mixrow"><span>${label}</span>
+          <div class="track"><div class="fill mag" style="width:calc(${(val * 96).toFixed(1)}% - 4px)"></div></div>
+          <span class="val">${pc(val)}%</span></div>`).join('')}
+      <div class="mixrow" style="border-top:1px solid var(--line-soft);margin-top:7px;padding-top:9px">
+        <span>Overall</span><span class="val" style="grid-column:2/4">${pc(h.you.fg)}% shooting ·
+        ${h.you.ppg.toFixed(1)} points · ${h.you.turnovers.toFixed(1)} turnovers ·
+        ${h.you.oreb.toFixed(1)} offensive boards a game</span></div></div>
+
+    <div class="vsec"><h4>Watch a game</h4>
+      <p class="note">Every possession, against any of the eight. Same engine the tournament uses.</p>
+      <div class="oppgrid">${PRESETS.map((p, i) => `<button class="opp" data-watch="${i}"
+        aria-pressed="${r.h2hIndex === i}">
+        <b>${esc(p.name)}</b><span>${esc(p.tag)}</span>
+        <code>${SLOT_KEYS.map(k => POOL.find(x => x.id === p.picks[k])[k]).join(' / ')}</code>
+      </button>`).join('')}</div></div>
+  </div>`;
+}
+
+function screenLab(){
+  const picks = S.lab.picks;
+  const v = priced(picks);
+  const footer = `<button class="btn hot" data-act="scout" ${v.ok && !S.lab.busy ? '' : 'disabled'}>
+      ${S.lab.busy ? 'Scouting…' : 'Scout this build'}</button>
+    ${S.league && S.me != null && myBuild() && !myBuild().locked
+      ? '<button class="btn ghost sm" data-act="to-league">Use this for my league build</button>' : ''}
+    <button class="btn ghost sm" data-act="lab-random">Surprise me</button>
+    <button class="btn ghost sm" data-act="lab-clear">Clear</button>
+    <p class="note">${v.ok ? 'Runs 400 games against each of eight archetypes.'
+      : 'Fill all five slots inside the cap to scout it.'}</p>`;
+  return `<section><p class="eyebrow">Sandbox · no league needed</p>
+    <div class="head"><h2>The Lab</h2>
+      <p class="note" style="max-width:48ch">Build anything and find out how it actually holds up.
+        Nothing here touches your league.</p></div>
+    <div class="courtline" style="margin-bottom:16px"></div>
+    <div class="bay">${capSheet(picks, { title: 'Test Build', footer })}${poolTable(picks, { locked: false })}</div>
+    ${S.lab.result ? reportView(S.lab.result) : `<div class="empty-state" style="margin-top:18px">
+      <h3>No scouting report yet</h3>
+      <p class="note">Fill the five slots and hit <b>Scout this build</b>. You will get a win rate
+        against eight archetype opponents, a read on which of your five picks is actually carrying
+        the build, and a possession-by-possession game against any of them.</p></div>`}
+  </section>`;
 }
 
 function buildDl(b){
@@ -1183,6 +1727,18 @@ async function claim(i){
 }
 
 async function pick(playerId){
+  if (S.tab === 'lab') {
+    if (SLOT_KEYS.some(k => k !== S.slot && S.lab.picks[k] === playerId)) return;
+    S.lab.picks = { ...S.lab.picks, [S.slot]: playerId };
+    S.lab.result = null;
+    LS.set('lab', S.lab.picks);
+    const nx = SLOT_KEYS.slice(SLOT_KEYS.indexOf(S.slot) + 1)
+                        .concat(SLOT_KEYS.slice(0, SLOT_KEYS.indexOf(S.slot)))
+                        .find(k => !S.lab.picks[k]);
+    if (nx) { S.slot = nx; S.q = ''; }
+    render();
+    return;
+  }
   const b = myBuild();
   if (!b || b.locked) return;
   if (SLOT_KEYS.some(k => k !== S.slot && b.picks[k] === playerId)) return;
@@ -1231,19 +1787,82 @@ function demoLeague(){
   return { league: { name: 'Demo Run', budget: BUDGET, managers: EXAMPLE_NAMES.slice() }, builds };
 }
 
+function randomBuild(){
+  // A legal, distinct-source build with the cap actually spent — a real starting
+  // point to react to, not five random names that happen to fit.
+  for (let attempt = 0; attempt < 400; attempt++) {
+    const picks = {}; const used = new Set(); let spent = 0;
+    const order = SLOT_KEYS.slice().sort(() => Math.random() - 0.5);
+    for (let i = 0; i < order.length; i++) {
+      const k = order[i];
+      const left = budget() - spent - (order.length - i - 1) * 45;
+      const cands = POOL.filter(p => !used.has(p.id) && costOf(p[k]) <= left);
+      if (!cands.length) break;
+      const p = cands[Math.floor(Math.random() * cands.length)];
+      picks[k] = p.id; used.add(p.id); spent += costOf(p[k]);
+    }
+    if (priced(picks).ok && spent >= budget() - 40) return picks;
+  }
+  return { sc: 'klay16', hnd: 'reggie95', frm: 'tyson12', def: 'bowen05', ath: 'marion06' };
+}
+
+function runScout(idx){
+  if (!priced(S.lab.picks).ok) return;
+  S.lab.busy = true; render();
+  // Yield a frame so the button repaints before the run blocks the thread.
+  setTimeout(() => {
+    try {
+      const me = toFighter({ id: 'lab', manager: 'Your build', picks: S.lab.picks }, POOL);
+      const field = labFighters();
+      const seed = 'lab-' + Date.now();
+      const g = gauntlet(me, field, 400, seed);
+      const h2hIndex = typeof idx === 'number' ? idx
+        : field.findIndex(f => f.manager === g.worst.name);
+      const h = headToHead(me, field[h2hIndex], 400, seed + '|h2h');
+      const lev = leverage({ id: 'lab', manager: 'Your build', picks: S.lab.picks },
+                           POOL, field, toFighter, 120, seed + '|lev');
+      S.lab.result = { gauntlet: g, h2h: h, leverage: lev, runs: 400,
+                       readout: readout(g, h), h2hIndex,
+                       h2hName: field[h2hIndex].manager, seed };
+    } catch (e) {
+      alert('Could not scout that build: ' + e.message);
+    } finally { S.lab.busy = false; render(); }
+  }, 16);
+}
+
+function watchLab(i){
+  if (!priced(S.lab.picks).ok) return;
+  const me = toFighter({ id: 'lab', manager: 'Your build', picks: S.lab.picks }, POOL);
+  const opp = labFighters()[i];
+  const seed = (S.lab.result ? S.lab.result.seed : 'lab') + '|watch|' + i + '|' + Date.now();
+  const series = simulateSeries(me, opp, seed);
+  $('dlg-t').textContent = 'Your build vs ' + opp.manager;
+  $('dlg-b').innerHTML = `<p class="note" style="margin:10px 0 0">Best of three ·
+    ${esc(series.managers[series.winner])} wins ${series.wins[series.winner]}-${series.wins[1 - series.winner]}</p>` +
+    series.games.map((g, n) => `<div class="gm"><h4><span>Game ${n + 1}</span>
+      <span>${esc(g.managers[0])} ${g.score[0]} — ${g.score[1]} ${esc(g.managers[1])}</span></h4>
+      <p class="note" style="margin:0 0 6px">${esc(g.opening)}</p>
+      <ul class="pbp">${g.log.map(l => `<li class="${l.pts ? 'score' : l.action === 'turnover' || l.action === 'block' ? 'turn' : ''}">
+        <span class="n">${l.n}</span>
+        <span><b>${esc(l.offName)}</b> — ${esc(l.text)}</span>
+        <span class="s">${l.score[0]}-${l.score[1]}</span></li>`).join('')}</ul></div>`).join('');
+  $('dlg').showModal();
+}
+
 /* ── render ─────────────────────────────────────────────────────────────── */
 function render(){
   paintBoard(); paintTabs();
   let html;
   // Only the build screen needs to know who you are. Everything else is
   // spectator-safe, so someone watching on the big screen never hits a wall.
-  if (!S.league) { S.tab = 'setup'; html = screenSetup(); }
+  if (S.tab === 'lab') html = screenLab();
   else if (S.tab === 'setup') html = screenSetup();
+  else if (!S.league) { S.tab = 'lab'; html = screenLab(); }
   else if (S.tab === 'league') html = screenLeague();
   else if (S.tab === 'tournament') html = screenTournament();
   else if (S.tab === 'board') html = S.tourney ? screenBoard() : screenTournament();
   else html = (S.me != null && myBuild()) ? screenBuild() : screenIdentify();
-  if (S.note === 'offline') html = `<div class="banner"><b>Not synced</b> — league sharing is
+  if (S.note === 'offline' && S.tab !== 'lab' && S.tab !== 'setup') html = `<div class="banner"><b>Not synced</b> — league sharing is
     unavailable in this view, so everything below is saved to this browser only. The build tools,
     the simulator and the tournament all work; other managers just won't see your entries.</div>` + html;
   $('app').innerHTML = html;
@@ -1252,13 +1871,14 @@ function render(){
 
 /* ── events ─────────────────────────────────────────────────────────────── */
 document.addEventListener('click', async ev => {
-  const t = ev.target.closest('[data-tab],[data-slot],[data-pick],[data-act],[data-claim],[data-series]');
+  const t = ev.target.closest('[data-tab],[data-slot],[data-pick],[data-act],[data-claim],[data-series],[data-watch]');
   if (!t) return;
   if (t.dataset.tab)   { S.tab = t.dataset.tab; render(); }
   else if (t.dataset.slot)   { S.slot = t.dataset.slot; S.q = ''; render(); }
   else if (t.dataset.pick)   { await pick(t.dataset.pick); }
   else if (t.dataset.claim)  { await claim(Number(t.dataset.claim)); }
   else if (t.dataset.series) { openSeries(t.dataset.series); }
+  else if (t.dataset.watch)  { watchLab(Number(t.dataset.watch)); }
   else if (t.dataset.act) {
     const a = t.dataset.act;
     if (a === 'save-league') {
@@ -1291,6 +1911,22 @@ document.addEventListener('click', async ev => {
       S.league = d.league; S.builds = d.builds; S.me = null;
       if (!live) { LS.set('league', d.league); LS.set('builds', d.builds); }
       await runTourney('demo-run');
+    } else if (a === 'scout' || a === 'rescout') {
+      runScout();
+    } else if (a === 'lab-clear') {
+      S.lab = { picks: {}, result: null, busy: false }; LS.set('lab', {}); render();
+    } else if (a === 'lab-random') {
+      S.lab.picks = randomBuild(); S.lab.result = null; LS.set('lab', S.lab.picks); render();
+    } else if (a === 'to-lab') {
+      const b = myBuild();
+      if (b) { S.lab.picks = { ...b.picks }; S.lab.result = null; LS.set('lab', S.lab.picks); }
+      S.tab = 'lab'; render();
+    } else if (a === 'to-league') {
+      const b = myBuild();
+      if (b && !b.locked && priced(S.lab.picks).ok) {
+        await saveBuild({ ...b, picks: { ...S.lab.picks } });
+        S.tab = 'build'; render();
+      }
     } else if (a === 'copy-code') {
       const b = myBuild();
       navigator.clipboard?.writeText(encodeBuild(S.me, b.picks)).then(() => {
@@ -1334,6 +1970,8 @@ S.league = seeded.league || null;
 S.builds = seeded.builds || {};
 S.tourney = seeded.tourney || null;
 S.me = LS.get('me', null);
+S.lab.picks = LS.get('lab', {}) || {};
+if (!S.league) S.tab = 'lab';
 render();
 connect();
 })();

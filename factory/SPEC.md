@@ -157,6 +157,78 @@ every placement was decided by games and every game is reproducible from a seed.
 - [t2] AC-21: Given the published artifact, when two browsers open it and one
   locks a build, then the other sees the lock count increase without a reload.
 
+## Round 2 — The Lab (2026-09-09, requested after gate 1)
+
+Scope added at the user's request: a solo sandbox for testing a build without
+creating a league. Not an amendment — nothing above changed.
+
+### Decisions
+- The Lab lives in the same artifact, not a separate one, so there is one link.
+- It is the landing tab when no league exists. Setup is no longer forced.
+- Eight preset opponents, each cap-legal with five distinct sources, spread so
+  the field averages 37%-60% against itself. A field that is all pushovers or
+  all monsters would make the headline number meaningless.
+- The headline is win rate across the whole field, not against one opponent —
+  a single matchup says more about the matchup than about the build.
+- Chart marks use their own validated tokens. The UI accent green (#1F5E4E)
+  has chroma 0.069 and reads gray as a chart fill, so charts use #0E7A5C /
+  #C4441F in light and #20A47C / #EA6134 in dark.
+- Lab state is browser-local and never written to the league's shared store.
+
+### Acceptance criteria
+- [t1] AC-22: Given a build and an opponent, when the same head-to-head is run
+  twice with the same seed, then both runs return identical aggregates.
+- [t1] AC-23: Given a head-to-head result, when its shot mix is summed, then it
+  totals 1, and shooting percentage, clean-look rate and blow-by rate are all
+  between 0 and 1.
+- [t1] AC-24: Given a flat-90 build and a flat-70 build, when both are run
+  against the same field, then the stronger build's gauntlet score exceeds the
+  weaker one's by at least 20 points.
+- [t1] AC-25: Given a gauntlet result, when best and worst are read, then they
+  are the maximum and minimum of the rows reported, and the overall score is the
+  mean of those rows.
+- [t1] AC-26: Given a five-slot build, when leverage runs, then it returns one
+  row per slot sorted by impact, and every replacement it proposes leaves five
+  distinct source players in the build.
+- [t1] AC-27: Given any win rate from 0 to 100, when it is graded, then it falls
+  into exactly one of Strong / Solid / Middling / Struggling with no gap.
+- [t1] AC-28: Given a readout, when it is rendered, then its first line names
+  the grade and the overall figure, and its second names the best and worst
+  matchup by the names in the gauntlet rows.
+
+## Round 3 — Player comps and mobile (2026-09-09, requested)
+
+Two asks: the leverage chart's axis labels collided on a phone, and the report
+should say what archetype a build is, ideally overlaid on a real player.
+
+### Decisions
+- Match is root-mean-square difference across the five ratings, anchored on
+  measurement rather than taste: two players drawn at random from this pool sit
+  at RMS 18.2, so that distance is DEFINED as 50%. The scale constant is 36.
+- Matching is on raw ratings, not shape-normalised. A cap-legal build cannot
+  reach a superstar's magnitude, and "you built roughly peak Anthony Davis" is
+  more useful and more honest than "you have LeBron's silhouette at half size".
+- A radar is the right form here and only here: five axes on one shared 0-99
+  scale, two profiles compared. Identity is carried by fill-vs-dashed-stroke and
+  per-axis numeric labels, not by color alone.
+- Report tables live in their own overflow-x container. Chromium lays out closed
+  `<details>` content, so a hidden table still widened the page.
+
+### Acceptance criteria
+- [t1] AC-29: Given a profile, when its distance to itself is measured, then it
+  is 0 and reads as a 100% match; distance is symmetric, grows with difference,
+  floors at 0% and never goes negative; and RMS 18.2 reads as 50%.
+- [t1] AC-30: Given a build, when comps are requested, then they are sorted by
+  distance, every match is between 0 and 1, the top comp beats the pool average
+  distance by at least half, and a profile copied from a real player returns
+  that player at 100%.
+- [t1] AC-31: Given a build close to one archetype, when the archetype is
+  resolved, then that archetype is named with a match above 85% and a runner-up
+  no closer than the winner.
+- [t1] AC-32: Given the report at a 390px viewport, when it is rendered, then
+  the document is exactly 390px wide with no horizontal page scroll, and any
+  table wider than that scrolls inside its own container.
+
 ## Appended
 
 <empty — written only by factory-judge>
