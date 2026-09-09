@@ -1,0 +1,12 @@
+{
+  "name": "1v1-simulator",
+  "version": "1.0.0",
+  "description": "Fantasy basketball draft order, decided by a 1v1 tournament of custom-built players.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "calibrate": "node tools/calibrate.js",
+    "build": "node tools/build.js"
+  },
+  "license": "MIT"
+}

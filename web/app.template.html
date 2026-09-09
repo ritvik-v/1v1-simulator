@@ -1,0 +1,832 @@
+<title>Blacktop Draft</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#E8EAE6; --surface:#F6F7F4; --surface-2:#DFE3DC; --sunken:#D6DBD2;
+  --ink:#14181A; --ink-2:#39423E; --muted:#69736D; --faint:#98A29B;
+  --line:#C7CDC3; --line-soft:#D9DED4;
+  --accent:#C4441F; --accent-ink:#FFF3EE; --accent-soft:#F5DED4;
+  --court:#1F5E4E; --court-soft:#D3E5DD;
+  --gold:#96682A; --gold-soft:#F0E2C8;
+  --shadow:0 1px 0 rgba(20,24,26,.06), 0 8px 24px -16px rgba(20,24,26,.5);
+  --f-display:"Saira Condensed",Oswald,"Arial Narrow",sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#101413; --surface:#171C1A; --surface-2:#1E2422; --sunken:#0B0E0D;
+  --ink:#E9EEE9; --ink-2:#C2CBC5; --muted:#8B968F; --faint:#69736D;
+  --line:#2B3330; --line-soft:#232A28;
+  --accent:#FF6B3D; --accent-ink:#1A0E08; --accent-soft:#3A1D11;
+  --court:#4FBF9A; --court-soft:#12312A;
+  --gold:#D9A441; --gold-soft:#33270F;
+  --shadow:0 1px 0 rgba(0,0,0,.4), 0 12px 28px -18px #000;
+}}
+:root[data-theme="dark"]{
+  --ground:#101413; --surface:#171C1A; --surface-2:#1E2422; --sunken:#0B0E0D;
+  --ink:#E9EEE9; --ink-2:#C2CBC5; --muted:#8B968F; --faint:#69736D;
+  --line:#2B3330; --line-soft:#232A28;
+  --accent:#FF6B3D; --accent-ink:#1A0E08; --accent-soft:#3A1D11;
+  --court:#4FBF9A; --court-soft:#12312A;
+  --gold:#D9A441; --gold-soft:#33270F;
+  --shadow:0 1px 0 rgba(0,0,0,.4), 0 12px 28px -18px #000;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-body);
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;margin:0}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.05;
+  letter-spacing:.005em;font-weight:700}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── court-line rule: the double stripe painted on a blacktop key ── */
+.courtline{height:0;border-top:2px solid var(--ink);border-bottom:1px solid var(--line);
+  padding-bottom:3px;opacity:.28}
+
+/* ── scoreboard strip ── */
+.board{position:sticky;top:0;z-index:30;background:var(--sunken);
+  border-bottom:1px solid var(--line);}
+.board-in{max-width:1240px;margin:0 auto;padding:10px 18px;display:flex;
+  align-items:center;gap:18px;flex-wrap:wrap}
+.mark{display:flex;align-items:baseline;gap:9px;margin-right:auto}
+.mark b{font-family:var(--f-display);font-size:22px;font-weight:800;letter-spacing:-.01em;
+  text-transform:uppercase}
+.mark span{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted)}
+.stat{display:flex;flex-direction:column;gap:1px;min-width:62px}
+.stat i{font-style:normal;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted)}
+.stat b{font-family:var(--f-display);font-size:19px;font-weight:700;
+  font-variant-numeric:tabular-nums;line-height:1}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:10.5px;
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:2px;
+  border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+.pill.live{border-color:var(--court);color:var(--court);background:var(--court-soft)}
+.pill.hot{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+
+/* ── tabs ── */
+nav.tabs{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:49px;z-index:29}
+.tabs-in{max-width:1240px;margin:0 auto;padding:0 18px;display:flex;gap:2px;overflow-x:auto}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:11px 14px;
+  font-family:var(--f-display);font-size:15px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .badge{font-family:var(--f-mono);font-size:10px;background:var(--accent);color:var(--accent-ink);
+  padding:1px 5px;border-radius:2px;margin-left:6px;letter-spacing:0}
+
+main{max-width:1240px;margin:0 auto;padding:22px 18px 80px}
+.eyebrow{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 6px}
+.lede{color:var(--ink-2);max-width:64ch;margin:8px 0 0}
+section{margin-bottom:34px}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  margin-bottom:12px}
+.head h2{font-size:27px;text-transform:uppercase;letter-spacing:.01em}
+
+/* ── build bay ── */
+.bay{display:grid;grid-template-columns:minmax(300px,384px) 1fr;gap:22px;align-items:start}
+@media (max-width:900px){.bay{grid-template-columns:1fr}}
+.sheet{background:var(--surface);border:1px solid var(--line);position:sticky;top:100px;
+  max-height:calc(100vh - 116px);overflow-y:auto}
+@media (max-width:900px){.sheet{position:static;max-height:none;overflow:visible}}
+.sheet-hd{padding:13px 15px 11px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.sheet-hd h3{font-size:17px;text-transform:uppercase;letter-spacing:.05em}
+.cap{padding:13px 15px;border-bottom:1px solid var(--line-soft)}
+.cap-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:7px}
+.cap-row b{font-family:var(--f-display);font-size:31px;font-weight:800;font-variant-numeric:tabular-nums;
+  line-height:.9}
+.cap-row small{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.meter{height:7px;background:var(--sunken);border:1px solid var(--line-soft);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--court);transition:width .3s ease}
+.meter i.over{background:var(--accent)}
+.slot{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 15px;width:100%;
+  text-align:left;background:none;border:0;border-bottom:1px solid var(--line-soft);cursor:pointer;
+  border-left:3px solid transparent}
+.slot:hover{background:var(--surface-2)}
+.slot[aria-current="true"]{border-left-color:var(--accent);background:var(--surface-2)}
+.slot-k{font-family:var(--f-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);grid-column:1}
+.slot-v{font-family:var(--f-display);font-size:18px;font-weight:600;grid-column:1;line-height:1.15}
+.slot-v.empty{color:var(--faint);font-style:italic;font-weight:500}
+.slot-sub{font-size:12px;color:var(--muted);grid-column:1}
+.slot-r{grid-column:2;grid-row:1/4;text-align:right;display:flex;flex-direction:column;
+  justify-content:center;gap:2px}
+.rating{font-family:var(--f-display);font-size:25px;font-weight:800;font-variant-numeric:tabular-nums;
+  line-height:1}
+.price{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.sheet-ft{padding:13px 15px;display:flex;flex-direction:column;gap:9px}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--ground);padding:9px 15px;
+  font-family:var(--f-display);font-size:15px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;cursor:pointer;transition:opacity .15s}
+.btn:hover:not(:disabled){opacity:.85}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.hot{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:none;color:var(--ink);border-color:var(--line)}
+.btn.sm{padding:6px 11px;font-size:13px}
+.warn{font-size:12.5px;color:var(--accent);display:flex;gap:7px;align-items:flex-start}
+.warn::before{content:"▲";font-size:9px;line-height:1.6;flex:none}
+
+/* ── pool table ── */
+.pool{background:var(--surface);border:1px solid var(--line)}
+.pool-hd{padding:12px 15px;border-bottom:1px solid var(--line);display:flex;gap:11px;
+  align-items:center;flex-wrap:wrap;background:var(--surface-2)}
+.pool-hd h3{font-size:17px;text-transform:uppercase;letter-spacing:.05em;margin-right:auto}
+input[type=search],input[type=text],select{font:inherit;font-size:13.5px;padding:6px 9px;
+  background:var(--ground);border:1px solid var(--line);color:var(--ink);border-radius:0}
+input[type=search]{min-width:170px}
+.scroll{max-height:min(66vh,720px);overflow-y:auto;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{position:sticky;top:0;background:var(--surface);z-index:2;text-align:left;
+  font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;padding:8px 11px;border-bottom:1px solid var(--line);
+  white-space:nowrap}
+tbody td{padding:8px 11px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr.picked{background:var(--court-soft)}
+tbody tr.unaffordable{opacity:.42}
+.p-name{font-family:var(--f-display);font-size:16.5px;font-weight:600;line-height:1.15}
+.p-meta{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);letter-spacing:.03em}
+.p-note{font-size:12px;color:var(--muted);max-width:38ch}
+td.r{text-align:right;white-space:nowrap}
+.big{font-family:var(--f-display);font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
+.era{font-family:var(--f-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 5px;border:1px solid var(--line);color:var(--muted)}
+
+/* ── league roster ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:12px}
+.mgr{background:var(--surface);border:1px solid var(--line);padding:12px 14px;
+  display:flex;flex-direction:column;gap:7px;border-top:3px solid var(--line)}
+.mgr.locked{border-top-color:var(--court)}
+.mgr.you{border-top-color:var(--accent)}
+.mgr-hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.mgr-hd b{font-family:var(--f-display);font-size:19px;font-weight:700}
+.mgr dl{margin:0;display:grid;grid-template-columns:auto 1fr auto;gap:3px 9px;font-size:12.5px}
+.mgr dt{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);align-self:center}
+.mgr dd{margin:0;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mgr dd.v{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);text-align:right}
+.hidden-build{font-size:12.5px;color:var(--faint);font-style:italic;padding:4px 0}
+
+/* ── tournament ── */
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:14px}
+.gcard{background:var(--surface);border:1px solid var(--line)}
+.gcard h4{margin:0;padding:9px 13px;font-family:var(--f-display);font-size:15px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;border-bottom:1px solid var(--line);
+  background:var(--surface-2)}
+.rounds{display:flex;flex-direction:column;gap:14px}
+.round h4{margin:0 0 7px;font-family:var(--f-display);font-size:15px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.series{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:9px}
+.sbtn{display:grid;grid-template-columns:1fr auto;gap:3px 10px;background:var(--surface);
+  border:1px solid var(--line);padding:9px 12px;text-align:left;cursor:pointer;width:100%}
+.sbtn:hover{border-color:var(--accent)}
+.sbtn .w{font-family:var(--f-display);font-size:16px;font-weight:700}
+.sbtn .l{font-family:var(--f-display);font-size:16px;font-weight:500;color:var(--muted)}
+.sbtn .sc{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums;text-align:right}
+.sbtn .gs{grid-column:1/3;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);
+  letter-spacing:.04em;padding-top:2px;border-top:1px solid var(--line-soft);margin-top:3px}
+
+/* ── draft board ── */
+.board-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);
+  background:var(--surface)}
+.pickrow{display:grid;grid-template-columns:64px 1fr auto;gap:16px;align-items:center;
+  padding:13px 16px;border-bottom:1px solid var(--line-soft)}
+.pickrow:last-child{border-bottom:0}
+.pickrow.top{background:var(--gold-soft)}
+.pick-n{font-family:var(--f-display);font-size:38px;font-weight:800;line-height:.85;
+  font-variant-numeric:tabular-nums;color:var(--muted);text-align:right}
+.pickrow.top .pick-n{color:var(--gold)}
+.pick-m{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1.1}
+.pick-d{font-size:12.5px;color:var(--muted)}
+.pick-r{text-align:right;font-family:var(--f-mono);font-size:11.5px;color:var(--muted);
+  line-height:1.7;white-space:nowrap}
+
+/* ── play-by-play ── */
+dialog{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0;
+  max-width:660px;width:calc(100% - 32px);max-height:84vh;box-shadow:var(--shadow)}
+dialog::backdrop{background:rgba(8,11,10,.62)}
+.dlg-hd{padding:14px 18px;border-bottom:1px solid var(--line);background:var(--surface-2);
+  display:flex;align-items:center;gap:12px;position:sticky;top:0}
+.dlg-hd h3{font-size:20px;text-transform:uppercase;letter-spacing:.04em;margin-right:auto}
+.dlg-bd{padding:6px 18px 18px;overflow-y:auto;max-height:calc(84vh - 60px)}
+.gm{margin-top:14px}
+.gm h4{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 6px;display:flex;justify-content:space-between}
+.pbp{list-style:none;margin:0;padding:0;font-size:13.5px}
+.pbp li{display:grid;grid-template-columns:40px 1fr 46px;gap:10px;padding:5px 0;
+  border-bottom:1px solid var(--line-soft);align-items:baseline}
+.pbp .n{font-family:var(--f-mono);font-size:10.5px;color:var(--faint);text-align:right}
+.pbp .s{font-family:var(--f-mono);font-size:12px;font-variant-numeric:tabular-nums;text-align:right;
+  color:var(--muted)}
+.pbp li.score{background:var(--court-soft)}
+.pbp li.score .s{color:var(--ink);font-weight:600}
+.pbp li.turn{color:var(--muted)}
+
+/* ── setup + misc ── */
+.card{background:var(--surface);border:1px solid var(--line);padding:18px}
+.names{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px;margin:14px 0}
+.name-in{display:flex;align-items:center;gap:8px}
+.name-in span{font-family:var(--f-mono);font-size:11px;color:var(--muted);width:18px;text-align:right}
+.name-in input{flex:1;min-width:0}
+.note{font-size:12.5px;color:var(--muted);margin:0}
+.empty-state{text-align:center;padding:42px 18px;border:1px dashed var(--line);background:var(--surface)}
+.empty-state h3{font-size:23px;text-transform:uppercase;margin-bottom:7px}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.banner{border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--surface);
+  padding:11px 14px;font-size:13px;color:var(--ink-2);margin-bottom:18px}
+.banner b{font-family:var(--f-display);letter-spacing:.04em;text-transform:uppercase}
+</style>
+
+<header class="board">
+  <div class="board-in">
+    <div class="mark"><b id="mk-name">Blacktop Draft</b><span id="mk-sub">1v1 for draft order</span></div>
+    <div class="stat"><i>Cap</i><b class="num" id="st-cap">750</b></div>
+    <div class="stat"><i>Locked</i><b class="num" id="st-locked">0/12</b></div>
+    <div class="stat"><i>You</i><b id="st-me" style="font-size:15px">—</b></div>
+    <span class="pill" id="st-phase"><span class="dot"></span><span>Loading</span></span>
+  </div>
+</header>
+
+<nav class="tabs"><div class="tabs-in" role="tablist" id="tabs"></div></nav>
+<main id="app"></main>
+<dialog id="dlg"><div class="dlg-hd"><h3 id="dlg-t">Series</h3>
+  <button class="btn ghost sm" onclick="document.getElementById('dlg').close()">Close</button></div>
+  <div class="dlg-bd" id="dlg-b"></div></dialog>
+
+<script>
+/*__BUNDLE__*/
+</script>
+<script>
+(function(){
+'use strict';
+const POOL = PLAYERS.players;
+const BY_ID = new Map(POOL.map(p => [p.id, p]));
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ERA = { current: '15-25', '2000s': '05-14', legend: 'pre-05' };
+
+// Deliberately no surnames that collide with players in the pool — a manager
+// called "Jordan" next to Michael Jordan reads as a bug.
+const EXAMPLE_NAMES = ['Ritvik','Marcus','Dev','Priya','Sam','Mo',
+                       'Alex','Nina','Theo','Cass','Rae','Wes'];
+
+let db = null, live = false;
+let S = {
+  tab: 'build', slot: 'sc', q: '', era: 'all', sortBy: 'rating',
+  league: null, builds: {}, tourney: null, me: null, busy: false, note: '',
+};
+
+/* ── identity ───────────────────────────────────────────────────────────── */
+const LS = {
+  get(k, d){ try { const v = localStorage.getItem('bd:' + k); return v ? JSON.parse(v) : d; }
+             catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem('bd:' + k, JSON.stringify(v)); } catch(e){} },
+};
+let TOKEN = LS.get('token');
+if (!TOKEN) { TOKEN = 'tk' + Math.random().toString(36).slice(2, 11); LS.set('token', TOKEN); }
+
+/* ── persistence: db when available, this browser only when not ─────────── */
+const local = {
+  read(){ return { league: LS.get('league'), builds: LS.get('builds', {}), tourney: LS.get('tourney') }; },
+};
+async function saveLeague(l){
+  S.league = l;
+  if (live) await db.doc('league/config').set(l); else LS.set('league', l);
+  render();
+}
+async function saveBuild(b){
+  S.builds = { ...S.builds, [b.slot]: b };
+  if (live) await db.doc('builds/' + b.slot).set(b); else LS.set('builds', S.builds);
+  render();
+}
+async function saveTourney(t){
+  S.tourney = t;
+  if (live) await db.doc('tournament/latest').set(t); else LS.set('tourney', t);
+  render();
+}
+
+async function connect(){
+  let cap = null;
+  try { cap = await claude.use('db'); } catch(e){ cap = null; }
+  if (!cap) { S.note = 'offline'; render(); return; }
+  db = cap; live = true; S.note = '';
+  db.doc('league/config').onSnapshot(s => { S.league = s.exists ? s.data() : null; render(); }, () => {});
+  db.collection('builds').onSnapshot(q => {
+    const next = {};
+    for (const d of q.docs) next[d.id] = d.data();
+    S.builds = next; render();
+  }, () => {});
+  db.doc('tournament/latest').onSnapshot(s => { S.tourney = s.exists ? s.data() : null; render(); }, () => {});
+}
+
+/* ── build codes ────────────────────────────────────────────────────────
+   A shared link only reaches people inside your Claude organization. A league
+   is twelve friends, so a build has to survive a text message too: this is the
+   whole build as one short string the commissioner can paste back in. */
+function encodeBuild(i, picks){
+  return 'BD' + (i + 1) + '-' + SLOT_KEYS.map(k => picks[k] || '_').join('.');
+}
+function decodeBuild(code){
+  const m = /BD(\d{1,2})-([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+){4})/.exec(String(code).trim());
+  if (!m) return { error: 'not a build code' };
+  const i = Number(m[1]) - 1;
+  if (i < 0 || i >= managers().length) return { error: 'manager ' + m[1] + ' is not in this league' };
+  const ids = m[2].split('.');
+  const picks = {};
+  for (let k = 0; k < SLOT_KEYS.length; k++) {
+    if (!BY_ID.has(ids[k])) return { error: 'unknown player "' + ids[k] + '"' };
+    picks[SLOT_KEYS[k]] = ids[k];
+  }
+  const v = validateBuild(picks, POOL, budget());
+  if (!v.ok) return { error: managers()[i] + ': ' + v.errors.join('; ') };
+  return { index: i, picks };
+}
+
+/* ── derived ────────────────────────────────────────────────────────────── */
+const managers = () => S.league ? S.league.managers : [];
+const myBuild  = () => S.me != null ? S.builds[String(S.me)] : null;
+const lockedList = () => managers().map((m, i) => S.builds[String(i)])
+                                   .filter(b => b && b.locked);
+const budget = () => S.league ? S.league.budget : BUDGET;
+
+function priced(picks){ return validateBuild(picks || {}, POOL, budget()); }
+
+function fightersFromBuilds(){
+  return managers().map((m, i) => {
+    const b = S.builds[String(i)];
+    return toFighter({ id: 'm' + i, manager: m, picks: b.picks }, POOL);
+  });
+}
+
+/* ── header ─────────────────────────────────────────────────────────────── */
+function paintBoard(){
+  const n = lockedList().length, total = managers().length || 12;
+  $('mk-name').textContent = S.league ? S.league.name : 'Blacktop Draft';
+  $('mk-sub').textContent = S.league ? '1v1 for draft order' : 'set up your league';
+  $('st-cap').textContent = budget();
+  $('st-locked').textContent = n + '/' + total;
+  $('st-me').textContent = S.me != null && managers()[S.me] ? managers()[S.me] : '—';
+  const p = $('st-phase');
+  let cls = 'pill', txt = 'Building';
+  if (!S.league) { txt = 'No league'; }
+  else if (S.tourney) { cls = 'pill live'; txt = 'Order set'; }
+  else if (n === total) { cls = 'pill hot'; txt = 'Ready to run'; }
+  p.className = cls;
+  p.innerHTML = '<span class="dot"></span><span>' + esc(txt) + '</span>';
+}
+
+const TABS = () => {
+  const t = [{ id:'build', label:'Build' }, { id:'league', label:'League' },
+             { id:'tournament', label:'Tournament' }];
+  if (S.tourney) t.push({ id:'board', label:'Draft Board' });
+  t.push({ id:'setup', label:'Setup' });
+  return t;
+};
+function paintTabs(){
+  $('tabs').innerHTML = TABS().map(t => {
+    const n = lockedList().length, total = managers().length || 12;
+    const badge = (t.id === 'league' && S.league && n < total)
+      ? '<span class="badge">' + (total - n) + '</span>' : '';
+    return '<button class="tab" role="tab" data-tab="' + t.id + '" aria-selected="' +
+      (S.tab === t.id) + '">' + t.label + badge + '</button>';
+  }).join('');
+}
+
+/* ── screens ────────────────────────────────────────────────────────────── */
+function screenSetup(){
+  const l = S.league;
+  const names = l ? l.managers : EXAMPLE_NAMES;
+  return `<section>
+    <p class="eyebrow">Commissioner</p>
+    <div class="head"><h2>${l ? 'League Settings' : 'Set Up The League'}</h2></div>
+    <div class="courtline"></div>
+    <p class="lede" style="margin-bottom:18px">Twelve managers, one salary cap, five attribute slots.
+      Everyone builds in private; once all twelve lock in, the builds reveal and the tournament
+      decides the draft order. First place picks first.</p>
+    <div class="card">
+      <div class="row" style="gap:18px">
+        <label>League name<br><input type="text" id="in-league" value="${esc(l ? l.name : 'Sunday Run')}" style="width:220px"></label>
+        <label>Salary cap<br><input type="text" id="in-cap" class="num" value="${l ? l.budget : BUDGET}" style="width:90px"></label>
+      </div>
+      <p class="note" style="margin-top:14px">Manager names${l ? '' : ' — these are examples, overwrite them with your league'}</p>
+      <div class="names">${names.map((n, i) =>
+        `<label class="name-in"><span class="num">${i + 1}</span><input type="text" data-mgr="${i}" value="${esc(n)}"></label>`).join('')}</div>
+      <div class="row">
+        <button class="btn hot" data-act="save-league">${l ? 'Save changes' : 'Create league'}</button>
+        ${l ? '<button class="btn ghost" data-act="reset">Reset everything</button>' : ''}
+      </div>
+      ${l ? '' : '<p class="note" style="margin-top:12px">You can change any of this later. Nothing is locked until managers lock their own builds.</p>'}
+    </div>
+    ${l ? `<div class="card" style="margin-top:14px">
+      <h3 style="font-size:19px;text-transform:uppercase;letter-spacing:.04em">Enter Builds By Code</h3>
+      <p class="note" style="margin:6px 0 10px">A shared link only works for people signed in to your
+        Claude organization. Everyone else can build on their own device, lock in, and text you their
+        build code — paste them here, one per line, and they join the league.</p>
+      <textarea id="in-codes" rows="5" placeholder="BD1-curry16.kyrie17.gobert21.bowen05.marion06&#10;BD2-jordan90.brunson24.sabonis23.caruso24.fox23"
+        style="width:100%;font-family:var(--f-mono);font-size:12.5px;padding:9px;background:var(--ground);
+        border:1px solid var(--line);color:var(--ink)"></textarea>
+      <div class="row" style="margin-top:10px"><button class="btn" data-act="import">Add these builds</button></div>
+      <p class="note" id="import-out" style="margin-top:10px"></p></div>` : ''}
+    ${!l ? `<div class="card" style="margin-top:14px">
+      <h3 style="font-size:19px;text-transform:uppercase;letter-spacing:.04em">Not sure yet?</h3>
+      <p class="note" style="margin:6px 0 12px">Run a full tournament with twelve example builds to see
+        exactly what draft night produces. It writes nothing you can't reset.</p>
+      <button class="btn" data-act="demo">Run a demo tournament</button></div>` : ''}
+  </section>`;
+}
+
+function screenIdentify(){
+  return `<section><p class="eyebrow">${esc(S.league.name)}</p>
+    <div class="head"><h2>Who Are You?</h2></div><div class="courtline"></div>
+    <p class="lede" style="margin:12px 0 18px">Pick your name to claim a slot. Your build stays on
+      this device and hidden from everyone else until all twelve managers have locked in.</p>
+    <div class="grid">${managers().map((m, i) => {
+      const b = S.builds[String(i)];
+      const taken = b && b.token && b.token !== TOKEN;
+      return `<button class="mgr" data-claim="${i}" ${taken ? 'disabled' : ''}
+        style="cursor:${taken ? 'not-allowed' : 'pointer'};opacity:${taken ? '.45' : '1'};text-align:left">
+        <div class="mgr-hd"><b>${esc(m)}</b>
+        <span class="pill">${taken ? 'Claimed' : b && b.locked ? 'Locked' : 'Open'}</span></div>
+        </button>`; }).join('')}</div></section>`;
+}
+
+function screenBuild(){
+  const b = myBuild();
+  const picks = b ? b.picks : {};
+  const v = priced(picks);
+  const locked = b && b.locked;
+  const spent = v.total, rem = budget() - spent, over = spent > budget();
+  const pct = Math.min(100, Math.round(spent / budget() * 100));
+
+  const sheet = `<aside class="sheet">
+    <div class="sheet-hd"><h3>${esc(managers()[S.me])}</h3></div>
+    <div class="cap">
+      <div class="cap-row"><b class="num" style="color:${over ? 'var(--accent)' : 'inherit'}">${spent}</b>
+        <small>${over ? (spent - budget()) + ' over' : rem + ' left'} · cap ${budget()}</small></div>
+      <div class="meter"><i class="${over ? 'over' : ''}" style="width:${pct}%"></i></div>
+    </div>
+    ${SLOTS.map(s => {
+      const line = v.lines.find(l => l.slot === s.key);
+      const p = line.empty ? null : line.player;
+      return `<button class="slot" data-slot="${s.key}" aria-current="${S.slot === s.key}">
+        <span class="slot-k">${s.label}</span>
+        <span class="slot-v${p ? '' : ' empty'}">${p ? esc(p.name) : 'Not picked'}</span>
+        <span class="slot-sub">${p ? esc(p.season) + ' · ' + esc(p.team) : esc(s.blurb)}</span>
+        <span class="slot-r">${p ? `<span class="rating">${line.rating}</span>
+          <span class="price num">${line.cost}</span>` : ''}</span></button>`;
+    }).join('')}
+    <div class="sheet-ft">
+      ${v.errors.map(e => `<p class="warn">${esc(e[0].toUpperCase() + e.slice(1))}</p>`).join('')}
+      ${locked
+        ? `<span class="pill live" style="justify-content:center;padding:9px"><span class="dot"></span><span>Locked in</span></span>
+           <p class="note" style="margin:0">Send this to your commissioner:</p>
+           <code class="num" style="display:block;background:var(--sunken);border:1px solid var(--line);
+             padding:7px 9px;font-size:12px;word-break:break-all">${esc(encodeBuild(S.me, picks))}</code>
+           <button class="btn ghost sm" data-act="copy-code">Copy build code</button>
+           <button class="btn ghost" data-act="unlock">Unlock and edit</button>`
+        : `<button class="btn hot" data-act="lock" ${v.ok ? '' : 'disabled'}>Lock in build</button>
+           <p class="note">${v.ok ? 'Once you lock, your build is final until you unlock it.' : 'Fill all five slots inside the cap to lock in.'}</p>`}
+    </div></aside>`;
+
+  const slot = SLOTS.find(s => s.key === S.slot);
+  const q = S.q.toLowerCase();
+  let rows = POOL.filter(p => (S.era === 'all' || p.era === S.era) &&
+    (!q || p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q)));
+  rows.sort((a, z) => S.sortBy === 'cost' ? costOf(a[S.slot]) - costOf(z[S.slot])
+                    : S.sortBy === 'name' ? (a.name < z.name ? -1 : 1)
+                    : z[S.slot] - a[S.slot]);
+  const otherSpend = v.lines.filter(l => l.slot !== S.slot && !l.empty)
+                            .reduce((s, l) => s + l.cost, 0);
+  const canSpend = budget() - otherSpend;
+
+  const pool = `<div class="pool">
+    <div class="pool-hd"><h3>${esc(slot.label)}</h3>
+      <input type="search" id="in-q" placeholder="Search 144 players" value="${esc(S.q)}" ${locked ? 'disabled' : ''}>
+      <select id="in-era" ${locked ? 'disabled' : ''}>
+        <option value="all"${S.era==='all'?' selected':''}>All eras</option>
+        <option value="current"${S.era==='current'?' selected':''}>2015-2025</option>
+        <option value="2000s"${S.era==='2000s'?' selected':''}>2005-2014</option>
+        <option value="legend"${S.era==='legend'?' selected':''}>Pre-2005</option></select>
+      <select id="in-sort" ${locked ? 'disabled' : ''}>
+        <option value="rating"${S.sortBy==='rating'?' selected':''}>Best first</option>
+        <option value="cost"${S.sortBy==='cost'?' selected':''}>Cheapest first</option>
+        <option value="name"${S.sortBy==='name'?' selected':''}>A-Z</option></select></div>
+    <p class="note" style="padding:9px 15px;margin:0;border-bottom:1px solid var(--line-soft)">${esc(slot.blurb)}
+      ${locked ? '' : ` You have <b class="num">${canSpend}</b> to spend here.`}</p>
+    <div class="scroll"><table><thead><tr>
+      <th>Player</th><th>Era</th><th class="r">${esc(slot.short)}</th><th class="r">Cost</th><th></th>
+    </tr></thead><tbody>${rows.map(p => {
+      const c = costOf(p[S.slot]);
+      const isPicked = picks[S.slot] === p.id;
+      const usedElsewhere = !isPicked && SLOT_KEYS.some(k => k !== S.slot && picks[k] === p.id);
+      const afford = c <= canSpend;
+      const blocked = usedElsewhere || (!afford && !isPicked);
+      return `<tr class="${isPicked ? 'picked' : ''}${blocked ? ' unaffordable' : ''}">
+        <td><div class="p-name">${esc(p.name)}</div>
+            <div class="p-meta">${esc(p.season)} · ${esc(p.team)}</div>
+            <div class="p-note">${esc(p.note)}</div></td>
+        <td><span class="era">${ERA[p.era]}</span></td>
+        <td class="r"><span class="big">${p[S.slot]}</span></td>
+        <td class="r"><span class="num">${c}</span></td>
+        <td class="r">${locked ? '' : isPicked
+          ? '<span class="pill live"><span>Yours</span></span>'
+          : usedElsewhere
+          ? '<span class="pill">Used</span>'
+          : `<button class="btn sm ${afford ? 'hot' : 'ghost'}" data-pick="${p.id}">${afford ? 'Take' : 'Over cap'}</button>`}</td></tr>`;
+    }).join('')}</tbody></table></div></div>`;
+
+  return `<section><p class="eyebrow">${esc(S.league.name)} · Your build</p>
+    <div class="head"><h2>Build Your Guy</h2>
+      <p class="note" style="max-width:46ch">Take one attribute from each of five players.
+        Spend up to ${budget()}. Nobody sees this until all twelve lock in.</p></div>
+    <div class="courtline" style="margin-bottom:16px"></div>
+    <div class="bay">${sheet}${pool}</div></section>`;
+}
+
+function buildDl(b){
+  const v = priced(b.picks);
+  return `<dl>${v.lines.map(l => `<dt>${SLOTS.find(s => s.key === l.slot).short}</dt>
+    <dd>${l.empty ? '—' : esc(l.player.name)}</dd>
+    <dd class="v">${l.empty ? '' : l.rating + ' · ' + l.cost}</dd>`).join('')}</dl>
+    <div class="p-meta">Spent ${v.total} of ${budget()}</div>`;
+}
+
+function screenLeague(){
+  const total = managers().length, n = lockedList().length, reveal = n === total;
+  return `<section><p class="eyebrow">${esc(S.league.name)}</p>
+    <div class="head"><h2>The League</h2>
+      <span class="pill ${reveal ? 'live' : 'hot'}"><span class="dot"></span><span>${n} of ${total} locked</span></span></div>
+    <div class="courtline" style="margin-bottom:16px"></div>
+    ${reveal ? '' : `<div class="banner"><b>Builds are hidden</b> — everything reveals the moment all
+      ${total} managers lock in, so nobody can counter-build. ${total - n} still to go.</div>`}
+    <div class="grid">${managers().map((m, i) => {
+      const b = S.builds[String(i)];
+      const mine = S.me === i;
+      return `<article class="mgr ${b && b.locked ? 'locked' : ''} ${mine ? 'you' : ''}">
+        <div class="mgr-hd"><b>${esc(m)}</b>
+          <span class="pill ${b && b.locked ? 'live' : ''}">${b && b.locked ? 'Locked' : b ? 'Building' : 'Not started'}</span></div>
+        ${(reveal || mine) && b && b.picks
+          ? buildDl(b)
+          : `<p class="hidden-build">${b && b.locked ? 'Locked and hidden until the reveal.' : 'Nothing locked in yet.'}</p>`}
+      </article>`; }).join('')}</div></section>`;
+}
+
+function screenTournament(){
+  const total = managers().length, n = lockedList().length;
+  if (!S.tourney) {
+    if (n < total) return `<section><p class="eyebrow">${esc(S.league.name)}</p>
+      <div class="head"><h2>Tournament</h2></div><div class="courtline"></div>
+      <div class="empty-state" style="margin-top:18px"><h3>Waiting on ${total - n} build${total - n > 1 ? 's' : ''}</h3>
+        <p class="note">Three groups of four, round robin, then a placement bracket — 38 best-of-three
+          series in all. Every one of the twelve draft slots gets decided by a game somebody played.</p>
+        <p class="note" style="margin-top:10px">${esc(managers().filter((m, i) => !(S.builds[String(i)] || {}).locked).join(', '))} still to lock in.</p>
+      </div></section>`;
+    return `<section><p class="eyebrow">${esc(S.league.name)}</p>
+      <div class="head"><h2>Tournament</h2></div><div class="courtline"></div>
+      <div class="empty-state" style="margin-top:18px"><h3>All twelve are in</h3>
+        <p class="note" style="margin-bottom:16px">38 best-of-three series. First to 11, win by two,
+          make-it-take-it. Every possession is simulated and every result replays from its seed.</p>
+        <button class="btn hot" data-act="run" ${S.busy ? 'disabled' : ''}>${S.busy ? 'Running…' : 'Run the tournament'}</button>
+      </div></section>`;
+  }
+  const t = S.tourney;
+  const name = id => (t.placements.find(p => p.id === id) || {}).manager || id;
+  const sBtn = s => `<button class="sbtn" data-series="${esc(s.key)}">
+      <span class="w">${esc(name(s.winnerId))}</span>
+      <span class="sc">${s.wins[s.winnerId === s.ids[0] ? 0 : 1]}-${s.wins[s.winnerId === s.ids[0] ? 1 : 0]}</span>
+      <span class="l">${esc(name(s.loserId))}</span><span></span>
+      <span class="gs">${s.scores.map(sc => sc.join('-')).join(' · ')}</span></button>`;
+
+  return `<section><p class="eyebrow">${esc(S.league.name)} · seed “${esc(t.seed)}”</p>
+    <div class="head"><h2>Tournament</h2>
+      <button class="btn ghost sm" data-act="rerun">Re-run with a new seed</button></div>
+    <div class="courtline" style="margin-bottom:16px"></div>
+    <h3 style="font-size:18px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Group Stage</h3>
+    <div class="groups" style="margin-bottom:26px">${t.groups.map(g => `<div class="gcard">
+      <h4>Group ${g.name}</h4><table><thead><tr><th>Team</th><th class="r">W-L</th><th class="r">Diff</th></tr></thead>
+      <tbody>${g.table.map(r => `<tr><td class="p-name" style="font-size:15px">${esc(name(r.id))}</td>
+        <td class="r num">${r.w}-${r.l}</td>
+        <td class="r num">${r.diff > 0 ? '+' : ''}${r.diff}</td></tr>`).join('')}</tbody></table></div>`).join('')}</div>
+    <h3 style="font-size:18px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Bracket</h3>
+    <div class="rounds">${t.rounds.map(r => `<div class="round"><h4>${esc(r.name)}</h4>
+      <div class="series">${r.series.map(sBtn).join('')}</div></div>`).join('')}</div>
+    <p class="note" style="margin-top:16px">Click any series for the full possession-by-possession log.</p>
+  </section>`;
+}
+
+function screenBoard(){
+  const t = S.tourney;
+  return `<section><p class="eyebrow">${esc(S.league.name)} · decided on the floor</p>
+    <div class="head"><h2>Draft Order</h2>
+      <button class="btn ghost sm" data-act="copy">Copy order</button></div>
+    <div class="courtline" style="margin-bottom:16px"></div>
+    <div class="board-list">${t.placements.map(p => `<div class="pickrow ${p.place <= 3 ? 'top' : ''}">
+      <span class="pick-n">${p.place}</span>
+      <span><span class="pick-m">${esc(p.manager)}</span>
+        <span class="pick-d">${esc(p.decidedBy)} · seeded ${p.seed} out of group ${p.group}</span></span>
+      <span class="pick-r">${p.record} in series<br>${p.seriesPlayed} played</span></div>`).join('')}</div>
+    <p class="note" style="margin-top:14px">Reproducible from seed “${esc(t.seed)}” — anyone can replay
+      every possession of all 38 series and get exactly these results.</p></section>`;
+}
+
+/* ── play-by-play ───────────────────────────────────────────────────────── */
+function openSeries(key){
+  const t = S.tourney;
+  const all = t.groups.flatMap(g => g.series).concat(t.rounds.flatMap(r => r.series));
+  const s = all.find(x => x.key === key);
+  if (!s) return;
+  const fighters = fightersFromBuilds();
+  const byId = new Map(fighters.map(f => [f.id, f]));
+  const a = byId.get(s.ids[0]), b = byId.get(s.ids[1]);
+  if (!a || !b) return;
+  const series = simulateSeries(a, b, s.seed);
+  $('dlg-t').textContent = s.managers[0] + ' vs ' + s.managers[1];
+  $('dlg-b').innerHTML = `<p class="note" style="margin:10px 0 0">${esc(s.round)} · best of three ·
+    ${esc(s.managers[series.winner])} wins ${series.wins[series.winner]}-${series.wins[1 - series.winner]}</p>` +
+    series.games.map((g, i) => `<div class="gm"><h4><span>Game ${i + 1}</span>
+      <span>${esc(g.managers[0])} ${g.score[0]} — ${g.score[1]} ${esc(g.managers[1])}</span></h4>
+      <p class="note" style="margin:0 0 6px">${esc(g.opening)}</p>
+      <ul class="pbp">${g.log.map(l => `<li class="${l.pts ? 'score' : l.action === 'turnover' || l.action === 'block' ? 'turn' : ''}">
+        <span class="n">${l.n}</span>
+        <span><b>${esc(l.offName)}</b> — ${esc(l.text)}</span>
+        <span class="s">${l.score[0]}-${l.score[1]}</span></li>`).join('')}</ul></div>`).join('');
+  $('dlg').showModal();
+}
+
+/* ── actions ────────────────────────────────────────────────────────────── */
+async function claim(i){
+  const path = 'builds/' + i;
+  const existing = S.builds[String(i)];
+  if (existing && existing.token && existing.token !== TOKEN) return;
+  if (live) {
+    const lease = await db.doc(path).acquire({ holder: TOKEN, ttlMs: 8000 });
+    if (!lease.acquired) { alert('Someone else is claiming that slot right now. Try again in a moment.'); return; }
+    const snap = await db.doc(path).get();
+    const cur = snap.exists ? snap.data() : null;
+    if (cur && cur.token && cur.token !== TOKEN) { alert('That slot was just claimed.'); return; }
+  }
+  S.me = i; LS.set('me', i);
+  await saveBuild({ slot: String(i), manager: managers()[i], token: TOKEN,
+                    picks: (existing && existing.picks) || {}, locked: false });
+}
+
+async function pick(playerId){
+  const b = myBuild();
+  if (!b || b.locked) return;
+  if (SLOT_KEYS.some(k => k !== S.slot && b.picks[k] === playerId)) return;
+  await saveBuild({ ...b, picks: { ...b.picks, [S.slot]: playerId } });
+  const i = SLOT_KEYS.indexOf(S.slot);
+  const next = SLOT_KEYS.slice(i + 1).concat(SLOT_KEYS.slice(0, i))
+                        .find(k => !({ ...b.picks, [S.slot]: playerId })[k]);
+  if (next) { S.slot = next; S.q = ''; render(); }
+}
+
+async function runTourney(seed){
+  S.busy = true; render();
+  try {
+    const t = runTournament(fightersFromBuilds(), seed);
+    await saveTourney(stripLogs(t));
+    S.tab = 'board';
+  } catch (e) {
+    alert(e.message);
+  } finally { S.busy = false; render(); }
+}
+
+function demoLeague(){
+  const shapes = [
+    { sc:99,hnd:97,frm:62,def:62,ath:74 }, { sc:74,hnd:54,frm:99,def:92,ath:76 },
+    { sc:80,hnd:96,frm:58,def:66,ath:96 }, { sc:74,hnd:72,frm:84,def:96,ath:88 },
+    { sc:90,hnd:64,frm:95,def:72,ath:78 }, { sc:85,hnd:85,frm:85,def:85,ath:85 },
+    { sc:92,hnd:88,frm:70,def:70,ath:80 }, { sc:70,hnd:60,frm:92,def:88,ath:86 },
+    { sc:88,hnd:80,frm:80,def:76,ath:76 }, { sc:66,hnd:90,frm:72,def:90,ath:84 },
+    { sc:94,hnd:74,frm:88,def:60,ath:68 }, { sc:78,hnd:78,frm:78,def:92,ath:92 },
+  ];
+  const builds = {};
+  shapes.forEach((sh, i) => {
+    const picks = {};
+    let spent = 0;
+    const used = new Set();
+    for (const k of SLOT_KEYS) {
+      const left = BUDGET - spent - SLOT_KEYS.slice(SLOT_KEYS.indexOf(k) + 1).length * 40;
+      const cands = POOL.filter(p => !used.has(p.id) && costOf(p[k]) <= Math.max(40, left))
+                        .sort((a, z) => Math.abs(a[k] - sh[k]) - Math.abs(z[k] - sh[k]));
+      const p = cands[0] || POOL.find(x => !used.has(x.id));
+      picks[k] = p.id; used.add(p.id); spent += costOf(p[k]);
+    }
+    builds[String(i)] = { slot: String(i), manager: EXAMPLE_NAMES[i], token: 'demo',
+                          picks, locked: true };
+  });
+  return { league: { name: 'Demo Run', budget: BUDGET, managers: EXAMPLE_NAMES.slice() }, builds };
+}
+
+/* ── render ─────────────────────────────────────────────────────────────── */
+function render(){
+  paintBoard(); paintTabs();
+  let html;
+  // Only the build screen needs to know who you are. Everything else is
+  // spectator-safe, so someone watching on the big screen never hits a wall.
+  if (!S.league) { S.tab = 'setup'; html = screenSetup(); }
+  else if (S.tab === 'setup') html = screenSetup();
+  else if (S.tab === 'league') html = screenLeague();
+  else if (S.tab === 'tournament') html = screenTournament();
+  else if (S.tab === 'board') html = S.tourney ? screenBoard() : screenTournament();
+  else html = (S.me != null && myBuild()) ? screenBuild() : screenIdentify();
+  if (S.note === 'offline') html = `<div class="banner"><b>Not synced</b> — league sharing is
+    unavailable in this view, so everything below is saved to this browser only. The build tools,
+    the simulator and the tournament all work; other managers just won't see your entries.</div>` + html;
+  $('app').innerHTML = html;
+  paintTabs();
+}
+
+/* ── events ─────────────────────────────────────────────────────────────── */
+document.addEventListener('click', async ev => {
+  const t = ev.target.closest('[data-tab],[data-slot],[data-pick],[data-act],[data-claim],[data-series]');
+  if (!t) return;
+  if (t.dataset.tab)   { S.tab = t.dataset.tab; render(); }
+  else if (t.dataset.slot)   { S.slot = t.dataset.slot; S.q = ''; render(); }
+  else if (t.dataset.pick)   { await pick(t.dataset.pick); }
+  else if (t.dataset.claim)  { await claim(Number(t.dataset.claim)); }
+  else if (t.dataset.series) { openSeries(t.dataset.series); }
+  else if (t.dataset.act) {
+    const a = t.dataset.act;
+    if (a === 'save-league') {
+      const names = [...document.querySelectorAll('[data-mgr]')].map(el => el.value.trim() || 'Manager');
+      const cap = Math.max(200, Math.min(3000, parseInt($('in-cap').value, 10) || BUDGET));
+      await saveLeague({ name: $('in-league').value.trim() || 'Sunday Run', budget: cap, managers: names });
+      S.tab = 'build'; render();
+    } else if (a === 'lock') {
+      const b = myBuild();
+      if (priced(b.picks).ok) await saveBuild({ ...b, locked: true, lockedAt: new Date().toISOString() });
+    } else if (a === 'unlock') {
+      await saveBuild({ ...myBuild(), locked: false });
+    } else if (a === 'run') {
+      await runTourney(S.league.name.toLowerCase().replace(/\s+/g, '-') + '-' + new Date().getFullYear());
+    } else if (a === 'rerun') {
+      const seed = prompt('Seed for the re-run — anything you like. The same seed always produces the same tournament.',
+        'rerun-' + Math.random().toString(36).slice(2, 7));
+      if (seed) await runTourney(seed);
+    } else if (a === 'reset') {
+      if (!confirm('Clear the league, every build and the draft order?')) return;
+      if (live) {
+        await db.doc('league/config').delete().catch(() => {});
+        await db.doc('tournament/latest').delete().catch(() => {});
+        for (const k of Object.keys(S.builds)) await db.doc('builds/' + k).delete().catch(() => {});
+      }
+      LS.set('league', null); LS.set('builds', {}); LS.set('tourney', null); LS.set('me', null);
+      S.league = null; S.builds = {}; S.tourney = null; S.me = null; render();
+    } else if (a === 'demo') {
+      const d = demoLeague();
+      S.league = d.league; S.builds = d.builds; S.me = null;
+      if (!live) { LS.set('league', d.league); LS.set('builds', d.builds); }
+      await runTourney('demo-run');
+    } else if (a === 'copy-code') {
+      const b = myBuild();
+      navigator.clipboard?.writeText(encodeBuild(S.me, b.picks)).then(() => {
+        t.textContent = 'Copied'; setTimeout(() => { t.textContent = 'Copy build code'; }, 1400);
+      }).catch(() => {});
+    } else if (a === 'import') {
+      const lines = $('in-codes').value.split('\n').map(x => x.trim()).filter(Boolean);
+      const ok = [], bad = [];
+      for (const line of lines) {
+        const r = decodeBuild(line);
+        if (r.error) { bad.push(line.slice(0, 24) + ' — ' + r.error); continue; }
+        await saveBuild({ slot: String(r.index), manager: managers()[r.index],
+                          token: 'imported', picks: r.picks, locked: true });
+        ok.push(managers()[r.index]);
+      }
+      const out = $('import-out');
+      if (out) out.innerHTML = (ok.length ? '<b>Added ' + ok.length + ':</b> ' + esc(ok.join(', ')) : '') +
+        (bad.length ? '<br><span style="color:var(--accent)">Skipped ' + bad.length + ': ' +
+          esc(bad.join(' · ')) + '</span>' : '');
+    } else if (a === 'copy') {
+      const txt = S.tourney.placements.map(p => p.place + '. ' + p.manager).join('\n');
+      navigator.clipboard?.writeText(txt).then(() => { t.textContent = 'Copied'; 
+        setTimeout(() => { t.textContent = 'Copy order'; }, 1400); }).catch(() => {});
+    }
+  }
+});
+document.addEventListener('input', ev => {
+  if (ev.target.id === 'in-q') { S.q = ev.target.value;
+    const sc = document.querySelector('.scroll'); const top = sc ? sc.scrollTop : 0;
+    render(); const s2 = document.querySelector('.scroll'); if (s2) s2.scrollTop = 0;
+    const el = $('in-q'); if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }
+});
+document.addEventListener('change', ev => {
+  if (ev.target.id === 'in-era')  { S.era = ev.target.value; render(); }
+  if (ev.target.id === 'in-sort') { S.sortBy = ev.target.value; render(); }
+});
+
+/* ── boot ───────────────────────────────────────────────────────────────── */
+const seeded = local.read();
+S.league = seeded.league || null;
+S.builds = seeded.builds || {};
+S.tourney = seeded.tourney || null;
+S.me = LS.get('me', null);
+render();
+connect();
+})();
+</script>
