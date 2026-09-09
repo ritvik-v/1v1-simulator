@@ -1862,9 +1862,10 @@ function render(){
   else if (S.tab === 'tournament') html = screenTournament();
   else if (S.tab === 'board') html = S.tourney ? screenBoard() : screenTournament();
   else html = (S.me != null && myBuild()) ? screenBuild() : screenIdentify();
-  if (S.note === 'offline' && S.tab !== 'lab' && S.tab !== 'setup') html = `<div class="banner"><b>Not synced</b> — league sharing is
-    unavailable in this view, so everything below is saved to this browser only. The build tools,
-    the simulator and the tournament all work; other managers just won't see your entries.</div>` + html;
+  if (S.note === 'offline' && S.tab !== 'lab' && S.tab !== 'setup') html = `<div class="banner"><b>Not synced</b> — live league
+    sharing is unavailable here, so everything below is saved to this browser only. Everything still
+    works: have each manager build on their own device, lock in, and send you their build code —
+    paste the twelve codes under <b>Setup</b> and run the tournament from here.</div>` + html;
   $('app').innerHTML = html;
   paintTabs();
 }
