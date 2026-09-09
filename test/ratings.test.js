@@ -92,3 +92,13 @@ test('AC-20 no source player is a strictly dominant buy', () => {
 test('unknown player ids are rejected rather than silently priced at zero', () => {
   assert.throws(() => priceBuild({ sc: 'nobody' }, POOL), /unknown player id/);
 });
+
+test('a build must draw its five attributes from five different players', () => {
+  const dup = { sc: 'shaq00', hnd: 'reggie95', frm: 'shaq00', def: 'bowen05', ath: 'marion06' };
+  const v = validateBuild(dup, POOL);
+  assert.equal(v.ok, false);
+  assert.match(v.errors.join(' '), /Shaquille O'Neal fills 2 slots/);
+  assert.match(v.errors.join(' '), /different player/);
+  const fixed = { ...dup, frm: 'tyson12' };
+  assert.equal(validateBuild(fixed, POOL).ok, true, validateBuild(fixed, POOL).errors.join('; '));
+});

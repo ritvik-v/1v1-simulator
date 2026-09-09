@@ -60,6 +60,19 @@ export function validateBuild(picks, pool, budget = BUDGET) {
   if (priced.total > budget) {
     errors.push(`over the cap by ${priced.total - budget} (spent ${priced.total} of ${budget})`);
   }
+  // Five attributes, five different players — taking a player's frame AND his
+  // athleticism is just picking that player, which is not the game.
+  const seen = new Map();
+  for (const l of priced.lines) {
+    if (l.empty) continue;
+    seen.set(l.playerId, (seen.get(l.playerId) || 0) + 1);
+  }
+  for (const [id, n] of seen) {
+    if (n > 1) {
+      const player = (pool instanceof Map ? pool : new Map(pool.map(p => [p.id, p]))).get(id);
+      errors.push(`${player.name} fills ${n} slots — each attribute must come from a different player`);
+    }
+  }
   return { ok: errors.length === 0, errors, ...priced };
 }
 
