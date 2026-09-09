@@ -1,5 +1,7 @@
 # Blacktop Draft
 
+**Play it: https://ritvik-v.github.io/1v1-simulator/**
+
 Fantasy basketball draft order, decided by a 1v1 tournament instead of a random
 number generator.
 
@@ -88,10 +90,15 @@ Run `npm run calibrate` to see the numbers for yourself.
 ## Use
 
 ```bash
-npm test        # 41 tests, no dependencies
-npm run build   # regenerate app.html from src/ + data/ + web/
+npm test        # 43 tests, no dependencies
+npm run build   # regenerate app.html and docs/index.html from src/ + data/ + web/
 npm run calibrate
 ```
+
+`docs/index.html` is the published site — the same page with its own document
+skeleton, served by GitHub Pages from `main` / `docs`. It is generated, not
+hand-edited: run `npm run build` after changing anything under `src/`, `data/`
+or `web/`.
 
 `app.html` is the whole app in one file — the ratings table, the simulator and
 the tournament are all inlined. Published as a Claude Artifact it syncs the
@@ -109,7 +116,8 @@ src/sim.js          the possession engine
 src/tournament.js   groups, bracket, placement
 src/scout.js        gauntlets, head-to-heads, per-slot leverage
 web/                page source
-tools/build.js      inlines everything into app.html
+tools/build.js      inlines everything into app.html and docs/index.html
+docs/index.html     the published GitHub Pages site (generated)
 factory/            SPEC (the contract), PLAN (the slices), STATE (the run)
 ```
 

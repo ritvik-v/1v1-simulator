@@ -70,3 +70,42 @@ test('the page declares the five slots and the cap it actually enforces', () => 
   }
   assert.ok(APP.includes('const BUDGET = 750'), 'the cap is not inlined');
 });
+
+test('AC-33 the published site is a complete, self-contained document', () => {
+  const SITE = readFileSync(url('docs/index.html'), 'utf8');
+  // Unlike app.html, this one must supply its own skeleton.
+  assert.match(SITE, /^<!doctype html>/i, 'site must start with a doctype');
+  for (const tag of ['<html lang="en">', '<head>', '<body>', '</html>']) {
+    assert.ok(SITE.includes(tag), `site is missing ${tag}`);
+  }
+  assert.match(SITE, /<meta name="viewport" content="width=device-width/, 'no responsive viewport');
+  assert.match(SITE, /<meta charset="utf-8">/, 'no charset');
+  assert.match(SITE, /<meta name="description" content="[^"]{40,}">/, 'no description for search results');
+  assert.match(SITE, /<link rel="icon"/, 'no favicon');
+  assert.match(SITE, /color-scheme:light dark/, 'site must honour both themes');
+
+  // It carries the whole app, and stays in step with the artifact build.
+  assert.ok(SITE.includes(APP), 'site content has drifted from app.html');
+  assert.ok(SITE.includes('const PLAYERS ='), 'ratings table is not inlined into the site');
+  assert.ok(SITE.includes('function runTournament'), 'engine is not inlined into the site');
+
+  // Nothing may be fetched from a host the artifact CSP would not allow, so the
+  // same file works in both places.
+  const refs = [...SITE.matchAll(/(?:src|href)="(https?:[^"]+)"/g)].map(m => m[1]);
+  for (const r of refs) {
+    assert.ok(r.startsWith('https://fonts.googleapis.com'), `unexpected external reference: ${r}`);
+  }
+  assert.ok(!/<script[^>]+src="(?!https:\/\/cdnjs|https:\/\/cdn\.jsdelivr)/.test(SITE),
+    'site must not load scripts from arbitrary hosts');
+});
+
+test('AC-34 the site degrades without the Claude runtime', () => {
+  const SITE = readFileSync(url('docs/index.html'), 'utf8');
+  // `claude` is simply not defined on a plain website, so the lookup must be
+  // inside a try/catch — an unguarded reference throws before anything renders.
+  const connect = SITE.slice(SITE.indexOf('async function connect()'), SITE.indexOf('/* ── derived'));
+  assert.match(connect, /try \{[\s\S]{0,60}claude\.use\('db'\)[\s\S]{0,40}\} catch/,
+    'claude.use must be guarded — the identifier does not exist off-platform');
+  assert.match(connect, /if \(!cap\)[\s\S]{0,80}render\(\)/, 'a missing runtime must still render');
+  assert.match(SITE, /build code/i, 'the offline path must point at build codes');
+});
